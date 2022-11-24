@@ -34,20 +34,70 @@ int  PointClassify(Mesh &m , Flat &f){
     }
     return zero;
 }
+std::vector<Vertex> tries (std::vector<Vertex> &intersect){
+    int num_of_triangles = 0;
+    for(int i = intersect.size() - 2; i>0; i--){
+        num_of_triangles +=i;
+    }
+    std::array arr[intersect.size()-1];
+    for(int i=0; i<intersect.size() - 1, ++i)
+        arr[i] = 0;
 
-Face NewFace(std::vector<Vertex> &intersect, Flat f){
+    for( int i = 1; i < intersect.size() - 2; ++i ){
+
+        for(int j = i + 1; j < intersect.size(); ++j ){
+            Vector try = VectorProduct( Vector(intersect[0], intersect[i]), Vector(intersect[i], intersect[j]));
+            if(try.x == norm.x && try.y == norm.y && try.z == norm.z ){
+                arr[j-1] ++;
+            }
+            else if(try.x == -norm.x && try.y == -norm.y && try.z == -norm.z ){
+                arr[i-1] ++;
+            }  
+        }
+    }
+    for(int j = 2; j<intersect.size(); j++){ //tries - список вершин новой грани в порядке обхода. 
+        for(int i=0; i < intersect.size() - 1, ++i){
+            if(arr[i] == intersect.size() - j)
+                tries.push_back(intersect[i+1])
+        }
+    }
+}
+
+
+void CheckDirection(Vector try, Flat f, Face new_face){
+    Vector norm = f.n.normalize();
+    try.normalize();
+    if(try.x == norm.x && try.y == norm.y && try.z == norm.z ){
+            new_face.Indices.push_back(2, 1, 0);
+        }
+        else if(try.x == -norm.x && try.y == -norm.y && try.z == -norm.z )
+            new_face.Indices.push_back(0, 1, 2);
+}
+
+
+Face NewFace(std::vector<Vertex> &intersect, Flat const &f, Mesh const &m){
     Face new_face;
+    Vector norm = f.n.normalize();
  // построение выпуклой оболочки
     if(intersect.size() == 3){
-        struct Vector norm = f.n.normalize();
-        struct Vector try = VectorProduct( Vector::Vector(intersect[0], intersect[1]), Vector::Vector(intersect[1], intersect[2]));
+        Vector try = VectorProduct( Vector::Vector(intersect[0], intersect[1]), Vector::Vector(intersect[1], intersect[2]));
         if(try.x == norm.x && try.y == norm.y && try.z == norm.z ){
             new_face.Indices.push_back(2, 1, 0);
         }
         else if(try.x == -norm.x && try.y == -norm.y && try.z == -norm.z )
             new_face.Indices.push_back(0, 1, 2);
     }
+    if(intersect.size() == 4){
+        Vector try1 = VectorProduct( Vector::Vector(intersect[0], intersect[1]), Vector::Vector(intersect[1], intersect[2]));
+        Vector try2 = VectorProduct( Vector::Vector(intersect[0], intersect[1]), Vector::Vector(intersect[1], intersect[3]));
+        Vector try3 = VectorProduct( Vector::Vector(intersect[1], intersect[2]), Vector::Vector(intersect[2], intersect[3]));
+
+    }
 }
+
+
+
+
 
 Mesh ResultOfIntersect( Mesh &m, Flat &f){
     int index = m.Vertices.size();
