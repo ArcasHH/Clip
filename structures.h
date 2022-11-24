@@ -10,6 +10,31 @@
 struct Vertex {
     float x, y, z;
     int c;
+    Vertex operator- (Vertex B, Vertex A){
+        Vertex v;
+        v.x = B.x - A.x;
+        v.y = B.y - A.y;
+        v.z = B.z - A.z;
+        return v;
+    }
+    Vertex operator+ (Vertex B, Vertex A){
+        Vertex v;
+        v.x = B.x + A.x;
+        v.y = B.y + A.y;
+        v.z = B.z + A.z;
+        return v;
+    }
+    Vertex operator* (Vertex v, float num){
+        v.x = num * v.x;
+        v.y = num * v.y;
+        v.z = num * v.z;
+        return v;
+    }
+    bool operator== (Vertex B, Vertex A){
+        if(B.x == A.x && B.y == A.y && B.z == A.z)
+            return true;
+        else return false;
+    }
 };
 
 struct Segment {
@@ -87,11 +112,13 @@ float ScalarProduct(Vector &v1, Vector &v2);
 
 Vector VectorProduct(Vector &v1, Vector &v2);
 
-Face NewFace(std::vector<Vertex> &intersect, Flat f);
-
 int PointInFlat (Vertex &p, Flat &f);
 
 void PointClassify(Vertex &p, Flat &f);
 
-Mesh ResultOfIntersect( Mesh &m, Flat &f);
+std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat f);
+
+Vertex Segment_Flat_Intersection(Segment s, Flat &f)
+
+void ResultOfIntersect( Mesh &m, Flat &f);
 
