@@ -2,20 +2,20 @@
 #include "obj_parser.h"
 
 
-float ScalarProduct(Vector &r1, Vector &r2){
-    return (r1.x * r2.x + r1.y * r2.y + r1.z * r2.z);
-};
+float Vector::dot(Vector const &A) const {
+    return x * A.x + y * A.y + z * A.z;
+}
 
-Vector VectorProduct(Vector r1, Vector r2){
+Vector Vector::cross(Vector const &A) const {
     Vector r;
-    r.x = (r1.y * r2.z) - (r1.z * r2.y);
-    r.y = -(r1.x * r2.z) + (r1.z * r2.x);
-    r.z = (r1.x * r2.y) - (r1.y * r2.x);
+    r.x = (y * A.z) - (z * A.y);
+    r.y = -(x * A.z) + (z * A.x);
+    r.z = (x * A.y) - (y * A.x);
     return r;
-};
+}
 
-int PointInFlat (Vertex &p, Flat &f){//подставление координат точки в ур.плоскости
-    return f.A * p.x + f.B * p.y + f.C * p.z + f.D;
+int PointInFlat (Vertex const &p, Flat const &f){//подставление координат точки в ур.плоскости
+    return f.A * p.x + f.B * p.y + f.C * p.z + f.D();
 }
 
 
@@ -71,20 +71,18 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat f){//упоря�
         num_of_triangles +=i;
     }
 
-    std::array arr[intersect.size()-1];//массив - количество появления вершин на второй позиции
+    std::vector<int> arr(intersect.size()-1);//массив - количество появления вершин на второй позиции
     for(int i=0; i<intersect.size() - 1; ++i)
         arr[i] = 0;
     for( int i = 1; i < intersect.size() - 2; ++i ){
         for(int j = i + 1; j < intersect.size(); ++j ){
 
-            Vector try = VectorProduct( Vector(intersect[0], intersect[i]), Vector(intersect[i], intersect[j]));
-            try.normalize();
-            if(try.x == norm.x && try.y == norm.y && try.z == norm.z ){
-                arr[i-1] ++;
-            }
-            else if(try.x == -norm.x && try.y == -norm.y && try.z == -norm.z ){
-                arr[j-1] ++;
-            }  
+            Vector Try = Vector{intersect[0], intersect[i]}.cross(Vector{intersect[i], intersect[j]}).normalize();
+            
+            if (Try == norm)
+                arr[i-1]++;
+            else if (Try == -norm)
+                arr[j-1]++;
         }
     }
 
@@ -97,29 +95,74 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat f){//упоря�
     return tries;
 }
 
-Vertex Segment_Flat_Intersection(Segment s, Flat f){//точка пересечения плоскости и отрезка
-    if(PointInFlat(s.A,f) * PointInFlat(s.B,f) < 0){
-        Vertex p = operator-(s.A, s.B);
-        float t = - ( PointInFlat(s.B, f)) / (PointInFlat(p, f) - f.D);
-        return operator+( operator* (s.A,t), operator* (s.B,1-t));
+Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f){//точка пересечения плоскости и отрезка
+    if(PointInFlat(s.A,f) * PointInFlat(s.B,f) < 0) {
+        Vertex p = s.A - s.B;
+        float t = - ( PointInFlat(s.B, f)) / (PointInFlat(p, f) - f.D());
+        return (s.A * t) + (s.B * (1.f - t));
     }
+
+    throw std::runtime_error("Here should be intersection!!!");
 }
 
 int getVertexIndex(Vertex v, Mesh m){
-    int m = m.Vertices.size();
+    int n = m.Vertices.size();
     for(int i =0; i < m.Vertices.size(); ++i){
-        m = m-1;
+        n = n-1;
         if(operator==(m.Vertices[i], v ))
             return i;
     }
-    if (m == 0){
-        return;
+    return -1;
+}
+
+void DeleteVertex(Mesh &m, Vertex &v){
+    for(int i =0; i < m.Vertices.size(); ++i){ //удаление 1 вершины из списка объекта//////////////////////////////
+        if( m.Vertices[i] == v){//////////////////////////////////////
+            if (i == m.Vertices.size() - 1){
+                m.Vertices.pop_back();
+                return;
+            }
+            else {
+                for(int j = i + 1; j < m.Vertices.size() ; ++j){
+                    m.Vertices[j - 1] = m.Vertices[ j ];
+                }
+            }
+        }
     }
 }
 
+void DeleteIndexes(Mesh &m, Face &f, int code){
+    for(int i =0; i < f.Indices.size(); ++i){ //удаление из списка вершины//////////////////////////////
+            if( m.Vertices[f.Indices[i]].c == code){
+                for(int j = i + 1; j < f.Indices.size() ; ++j){
+                    f.Indices[j - 1] = f.Indices[j];
+                }
+                f.Indices.pop_back();
+            }
+        }
+}
+
+void PushIndex(Face &f, int index, int j){
+    //вставка индекса index новой вершины в конец списвка грани
+    if(j == f.Indices.size() - 1){
+        f.Indices.push_back(index);
+    }
+    else{
+    //вставка индекса новой вершины в список на место j+1 (после j) в списке грани
+        f.Indices.push_back( f.Indices[f.Indices.size() - 1] );//копируем последний элемент в конец
+        for(int i = f.Indices.size() - 2; i > j; i--){
+            f.Indices[i + 1] = f.Indices[i];
+        }
+        f.Indices[j+1] = index;
+    }
+}
+
+
 //не работает, если плоскость пересекает вершины корректно
 
-void ResultOfIntersect( Mesh &m, Flat &f){
+Mesh ResultOfIntersect( Mesh const &m_in, Flat &f){
+    Mesh m{m_in};
+
     int index = m.Vertices.size();//индексы новых вершин
     int zero = OnPoints(m, f);//количество вершин объекта, лежащих на плоскости
     int sum = InPoints(m, f) - OutPoints(m, f);//cумма codes. нужно для определения крайних/вырожденных случаев
@@ -127,70 +170,58 @@ void ResultOfIntersect( Mesh &m, Flat &f){
     Face new_face;
     m.Faces.push_back(new_face);
     
-    if((sum == - (m.Vertices.size() - zero)) || (zero == 4 && sum == -4 )){//случаи, где результат - пустое множество
+    if((sum == - (m.Vertices.size() - zero)) ){//случаи, где результат - пустое множество
         std::cerr << "Empty intersect " << std::endl;
-        return;
+        return m;
     }
-    if((sum == (m.Vertices.size() - zero)) || (zero == 4 && sum == 4 )){// случаи, когда результат - исходный объект
+    if((sum == (m.Vertices.size() - zero)) ){// случаи, когда результат - исходный объект
         return m;
     }
 
     std::vector<Vertex> intersect; //points of intersect
     for(int i = 0; i < m.Faces.size(); ++i){//для каждой грани
+        int out = 0;
 
         for(int j =0; j < m.Faces[i].Indices.size(); ++j){//обходим каждую вершину грани
+            if(m.Vertices[m.Faces[i].Indices[j]].c == -1){
+                out++;
+            }
 
-            if( m.Vertices[m.Faces[i].Indices[j]].c != m.Vertices[m.Faces[i].Indices[(j+1) % m.Faces[i].Indices.size()]].c ){ //if adjacent vertices with different codes
+            if( m.Vertices[m.Faces[i].Indices[j]].c && m.Vertices[m.Faces[i].Indices[j]].c == -m.Vertices[m.Faces[i].Indices[(j+1) % m.Faces[i].Indices.size()]].c ){ //if adjacent vertices with different codes
                 Segment s;
                 s.A = m.Vertices[m.Faces[i].Indices[j]];
                 s.B = m.Vertices[m.Faces[i].Indices[(j+1) % m.Faces[i].Indices.size()]];
                 Vertex r = Segment_Flat_Intersection(s, f);
-                r.c = 0;
+                r.c = 0;//ON
                 intersect.push_back(r);
-                index ++;
-
-                //вставка индекса новой вершины в конец списвка грани
-                if(j == m.Faces[i].Indices.size() - 1){
-                    m.Faces[i].Indices.push_back(index);
-                    //еще вставить в MESH
-                }
-                else{
-                //вставка индекса новой вершины в список на место j+1 (после j) в списке грани
-                    m.Faces[i].Indices.push_back( m.Faces[i].Indices[m.Faces[i].Indices.size() - 1] );//копируем последний элемент в конец
-                    for(int s = m.Faces[i].Indices.size() - 2; s > j; s--){
-                        m.Faces[i].Indices[s] = m.Faces[i].Indices[s-1];
-                    }
-                    m.Faces[i].Indices[j+1] = index;
-                    //еще вставить в MESH
-                }
+                m.Vertices.push_back(r);
+                
+                PushIndex(m.Faces[i], index, j);
+                index++;
             }
         }
 
-        for(int j =0; j < m.Faces[i].Indices.size(); ++j){ //удаление из списка вершины//////////////////////////////
-            if( m.Vertices[m.Faces[i].Indices[j]].c == -1){
-                for(int s = j; s < m.Faces[i].Indices.size() - 1 ; ++s){
-                    m.Faces[i].Indices[s] = m.Faces[i].Indices[s+1];
-                }
-                m.Faces[i].Indices.pop_back;//удалить с конца?
-                //еще удалить в MESH
-            }
-        }
+        DeleteIndexes(m, m.Faces[i], -1);
+
+        
 
     }
+    // for(int i = 0; i < m.Faces.size(); ++i){
+    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j)
+    //         if(out == 4){//удаление i-ой грани из списка
+    //             for(int j = i+1; j<m.Faces.size(); j++){
+    //                 m.Faces[j-1] = m.Faces[j];
+    //         }
+    // }
+        
     
-    intersect = tries(intersect, f);//вектор вершин в нужном порядке для новой грани
-    for(int i = 0; i<intersect.size(); ++i){
-        new_face.Indices.push_back(intersect[i]);
-    }
+    // intersect = tries(intersect, f);//вектор вершин в нужном порядке для новой грани
+    // for(int i = 0; i<intersect.size(); ++i){
+    //     new_face.Indices.push_back(getVertexIndex(intersect[i], m));
+    // }
     
-    m.Faces.push_back(new_face);
+    // m.Faces.push_back(new_face);
 
-
-
-
-
-    //запись в файл новой грани и новых вершин
-   
-
-
+    // }
+    return m;
 }
