@@ -49,9 +49,18 @@ struct Vector {
         return tmp;
     }
 
-    Vector cross(Vector const &A) const; // TODO it is VectorProduct. [this x A]
-    float dot(Vector const &A) const; // TODO it is ScalarProduct. this * A
+    Vector cross(Vector const &A) const{
+        Vector r;
+        r.x = (y * A.z) - (z * A.y);
+        r.y = -(x * A.z) + (z * A.x);
+        r.z = (x * A.y) - (y * A.x);
+        return r;
+    } //  it is VectorProduct. [this x A]
+    float dot(Vector const &A) const{
+        return x * A.x + y * A.y + z * A.z;
+    } //  it is ScalarProduct. this * A
 };
+
 using Vertex = Vector;
 
 inline Vector operator+(Vector const &B, Vector const &A) {
@@ -87,15 +96,23 @@ struct Face {
     int &operator[] (int pos) { return Indices.at(pos); }
 };
 
+inline bool operator==(Face const &f1, Face const &f2) {
+    if(f1.Indices.size() == f2.Indices.size()){
+        for(int i = 0; i < f1.Indices.size(); ++i){
+            for (int j = 0; j < f2.Indices.size(); ++j)
+            if(f1.Indices[i] == f2.Indices[j])
+                for(int k = 0; k < f1.Indices.size(); ++k)
+                    if(f1.Indices[(i + k) % f1.Indices.size()] != f2.Indices[(j + k) % f2.Indices.size()])
+                        return false;
+        }
+        return true;
+    }
+}
+
 struct Flat {
     Vector n;
     Vertex p;
-    float &A = n.x;
-    float &B = n.y;
-    float &C = n.z;
-
-    // TODO: Do or A(), B() ... or n.x, n.y...
-    float D() const { return -A * p.x - B * p.y - C * p.z; }
+    float D() const { return -n.x * p.x - n.y * p.y - n.z * p.z; }
 };
 
 inline std::istream &operator>>(std::istream &is, Face &f) {
@@ -135,7 +152,9 @@ float ScalarProduct(Vector &v1, Vector &v2);
 
 Vector VectorProduct(Vector &v1, Vector &v2);
 
-int PointInFlat (Vertex const &p, Flat const &f);
+float PointInFlat (Vertex const &p, Flat const &f);
+
+int getVertexIndex(Vertex const &v, Mesh const &m);
 
 void PointClassify(Vertex &p, Flat &f);
 
@@ -143,9 +162,11 @@ void DeleteVertex(Mesh &m, Vertex &v);
 
 void DeleteIndexes(Mesh &m, Face &f, int code);
 
+void DeleteFace(Mesh &m, Face &f);
+
 void PushIndex(Face &f, int index);
 
-std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat f);
+std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f);
 
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f);
 
