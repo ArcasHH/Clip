@@ -51,22 +51,20 @@ public:
     vector<Texture>      textures;
     unsigned int VAO;
 
-    // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices/*, vector<Texture> textures*/)
-    {
-        this->vertices = vertices;
-        this->indices = indices;
-        // this->textures = textures;
+    bool IsTriangulated;
 
-        // now that we have all the required data, set the vertex buffers and its attribute pointers.
-        for (auto &&x : vertices)
-            std::cout << x << '\n';
-        setupMesh();
+    // constructor
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, bool IsTr) : vertices{vertices}, indices{indices}, IsTriangulated{IsTr} {
+        if (IsTriangulated)
+            setupMesh();
+        else
+            std::cout << "Cannot draw not triangulated mesh\n";
     }
 
     // render the mesh
     void Draw(Shader &shader) 
     {
+        if (!IsTriangulated) return;
         // bind appropriate textures
         unsigned int diffuseNr  = 1;
         unsigned int specularNr = 1;

@@ -65,6 +65,8 @@ Mesh loadOBJ(const char * path) {
 		throw std::runtime_error{"Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n"};
 	}
 
+    bool IsTriangulated = true;
+
 	while( 1 ){
 
 		char lineHeader[128];
@@ -89,17 +91,23 @@ Mesh loadOBJ(const char * path) {
 			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
 			temp_normals.push_back(normal);
 		}else if ( strcmp( lineHeader, "f" ) == 0 ){
-			std::string vertex1, vertex2, vertex3;
-			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
-			if (matches != 9){
-				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
-				fclose(file);
-				throw std::runtime_error{"File can't be read by our simple parser :-( Try exporting with other options\n"};
-			}
+            unsigned int vertexIndex[4], uvIndex[3], normalIndex[3];
+            int matches = fscanf(file, "%d %d %d %d", vertexIndex, vertexIndex+1, vertexIndex+2, vertexIndex+3);
+            if (matches != 4) {
+                matches = fscanf(file, "/%d/%d %d/%d/%d %d/%d/%d\n", &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
+                if (matches != 8){
+                    printf("File can't be read by our simple parser :-( Try exporting with other options\n");
+                    fclose(file);
+                    throw std::runtime_error{"File can't be read by our simple parser :-( Try exporting with other options\n"};
+                }
+            } else {
+                printf("faces\n");
+                IsTriangulated = false;
+            }
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);
+            if (!IsTriangulated) vertexIndices.push_back(vertexIndex[3]);
 			uvIndices    .push_back(uvIndex[0]);
 			uvIndices    .push_back(uvIndex[1]);
 			uvIndices    .push_back(uvIndex[2]);
@@ -146,8 +154,17 @@ Mesh loadOBJ(const char * path) {
     for(auto &&x : vertexIndices) {
         --x;
     }
+
+    // std::vector<unsigned int> vi = {
+    //     0,1,2,3,
+    //     0,4,5,1,
+    //     4,7,6,5,
+    //     2,6,7,3,
+    //     1,5,6,2,
+    //     0,3,7,4
+    // };
 	
-    return Mesh{Vertices, vertexIndices};
+    return Mesh{Vertices, vertexIndices, IsTriangulated};
 }
 
 

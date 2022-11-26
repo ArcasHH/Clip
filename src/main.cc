@@ -81,7 +81,7 @@ int main()
 
     // load models
     // -----------
-    Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\cube.obj");
+    Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\pure_cube.obj");
 
     
     // draw in wireframe
