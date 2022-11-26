@@ -1,6 +1,7 @@
 #include "structures.h"
 #include "obj_parser.h"
 
+#include <glm/vec4.hpp>
 
 
 int main(int argc, char *argv[]) {
