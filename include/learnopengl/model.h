@@ -22,7 +22,7 @@ class Model
 {
 public:
     // model data 
-    vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    // vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
@@ -32,6 +32,10 @@ public:
     {
         loadModel(path);
     }
+
+	Model(std::vector<Vertex> const &Vertices, std::vector<unsigned> const &Indices) {
+		meshes.push_back(Mesh{Vertices, Indices, true});
+	}
 
     // draws the model, and thus all its meshes
     void Draw(Shader &shader)

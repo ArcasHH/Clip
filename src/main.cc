@@ -79,9 +79,22 @@ int main()
     // -------------------------
     Shader ourShader("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.vs", "C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.fs");
 
-    // load models
-    // -----------
+
+    // INITIAL TRIANGULATED MODEL
     Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\pure_cube.obj");
+
+    // PLANE
+    // Plane ..
+
+    // Model res = Clip(outModel, Plane);
+
+    // Function interface
+    // Model Clip(Model const&M, Plane const &P) {
+    //    ...
+    //    std::vector<Vertex> Vertices = ...
+    //    std::vector<unsigned> Indices = ...
+    //    return Model{Vertices, Indices}; 
+    // }
 
     
     // draw in wireframe
