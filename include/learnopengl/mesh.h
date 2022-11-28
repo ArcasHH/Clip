@@ -21,11 +21,11 @@ struct Vertex {
     // normal
     glm::vec3 Normal;
     // texCoords
-    glm::vec2 TexCoords;
+    // glm::vec2 TexCoords;
     // tangent
     glm::vec3 Tangent;
     // bitangent
-    glm::vec3 Bitangent;
+    // glm::vec3 Bitangent;
 };
 
 std::ostream &operator<<(std::ostream& os, Vertex const & V) {
@@ -48,7 +48,7 @@ public:
             setupMesh();
         else
             std::cout << "Cannot draw not triangulated mesh\n";
-    }
+    } 
 
     // render the mesh
     void Draw(Shader &shader) 
@@ -64,7 +64,10 @@ public:
 
         // draw mesh
         glBindVertexArray(VAO);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        if (shader.WFM)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 

@@ -15,6 +15,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <unordered_map>
 using namespace std;
 
 namespace mdl{
@@ -48,6 +49,14 @@ private:
 
 };
 
+glm::vec3 operator/(glm::vec3 const & v, int i) {
+    glm::vec3 tmp = v;
+    tmp.x /= i;
+    tmp.y /= i;
+    tmp.z /= i;
+    return tmp;
+}
+
 Mesh loadOBJ(const char * path) {
 	printf("Loading OBJ file %s...\n", path);
 
@@ -55,6 +64,9 @@ Mesh loadOBJ(const char * path) {
 	std::vector<glm::vec3> temp_vertices; 
 	std::vector<glm::vec2> temp_uvs;
 	std::vector<glm::vec3> temp_normals;
+
+    std::vector<glm::vec3> out_vertices;
+	std::vector<glm::vec3> out_normals;
 
     std::vector<Vertex> Vertices;
 
@@ -123,9 +135,35 @@ Mesh loadOBJ(const char * path) {
 
 	fclose(file);
 
-    for (auto &&x : temp_vertices) {
-        Vertices.push_back(Vertex{.Position = x});
+    glm::vec3 avgNV(temp_vertices.size());
+    int count;
+
+    std::vector<glm::vec3> vAndN(temp_vertices.size());
+
+	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
+
+		// Get the indices of its attributes
+		unsigned int vertexIndex = vertexIndices[i];
+		unsigned int uvIndex = uvIndices[i];
+		unsigned int normalIndex = normalIndices[i];
+		
+		// Get the attributes thanks to the index
+		glm::vec3 vertex = temp_vertices[ vertexIndex-1 ];
+		glm::vec2 uv = temp_uvs[ uvIndex-1 ];
+		glm::vec3 normal = temp_normals[ normalIndex-1 ];
+		
+        vAndN[vertexIndex-1] += normal;
+	}
+
+    // for (auto &&x : temp_vertices) {
+    //     Vertices.push_back(Vertex{.Position = x});
+    // }
+
+    for (size_t i = 0; i != temp_vertices.size(); ++i) {
+        glm::vec3 N =  glm::normalize(vAndN[i]);
+        Vertices.push_back(Vertex{.Position = temp_vertices[i], .Normal = N });
     }
+
 
     for(auto &&x : vertexIndices) {
         --x;

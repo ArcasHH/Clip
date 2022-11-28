@@ -28,6 +28,8 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
+bool WireframeMode = false;
+
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -79,7 +81,7 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.vs", "C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.fs");
+    Shader ourShader("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.vs", "C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.fs", WireframeMode);
 
     // INITIAL TRIANGULATED MODEL
     mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\cube.obj");
@@ -130,6 +132,10 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
+        // hardcoded light
+        ourShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        ourShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        ourShader.setVec3("lightDir", 1.f, 1.f, 1.f);
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
@@ -166,6 +172,8 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+        WireframeMode = !WireframeMode;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

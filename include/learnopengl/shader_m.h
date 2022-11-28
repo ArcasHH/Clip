@@ -13,9 +13,10 @@ class Shader
 {
 public:
     unsigned int ID;
+    bool const &WFM;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader(const char* vertexPath, const char* fragmentPath)
+    Shader(const char* vertexPath, const char* fragmentPath, bool const &WFM) : WFM{WFM}
     {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
