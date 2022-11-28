@@ -11,6 +11,8 @@
 
 #include <iostream>
 
+#include "structures.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -79,14 +81,15 @@ int main()
     // -------------------------
     Shader ourShader("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.vs", "C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.fs");
 
-
     // INITIAL TRIANGULATED MODEL
-    Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\pure_cube.obj");
+    mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\cube.obj");
 
     // PLANE
-    // Plane ..
-
-    // Model res = Clip(outModel, Plane);
+    // Flat plane = getFlat();
+    // PointClassify(m, plane);
+    // SpecialCases(m, plane);
+    // Mesh res = ResultOfIntersect(m, plane);
+    // Triangulation(res);
 
     // Function interface
     // Model Clip(Model const&M, Plane const &P) {

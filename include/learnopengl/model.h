@@ -17,25 +17,20 @@
 #include <vector>
 using namespace std;
 
+namespace mdl{
+
 Mesh loadOBJ(const char * path);
 class Model 
 {
 public:
-    // model data 
-    // vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     vector<Mesh>    meshes;
     string directory;
-    bool gammaCorrection;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
+    Model(string const &path)
     {
         loadModel(path);
     }
-
-	Model(std::vector<Vertex> const &Vertices, std::vector<unsigned> const &Indices) {
-		meshes.push_back(Mesh{Vertices, Indices, true});
-	}
 
     // draws the model, and thus all its meshes
     void Draw(Shader &shader)
@@ -126,29 +121,6 @@ Mesh loadOBJ(const char * path) {
 
 	}
 
-	// // For each vertex of each triangle
-	// for( unsigned int i=0; i<vertexIndices.size(); i++ ){
-
-	// 	// Get the indices of its attributes
-	// 	unsigned int vertexIndex = vertexIndices[i];
-	// 	unsigned int uvIndex = uvIndices[i];
-	// 	unsigned int normalIndex = normalIndices[i];
-
-    //     std::cout << "vI " << vertexIndex << '\n';
-		
-	// 	// Get the attributes thanks to the index
-	// 	glm::vec3 vertex = temp_vertices[ vertexIndex-1 ];
-	// 	glm::vec2 uv = temp_uvs[ uvIndex-1 ];
-	// 	glm::vec3 normal = temp_normals[ normalIndex-1 ];
-		
-	// 	// Put the attributes in buffers
-	// 	// out_vertices.push_back(vertex);
-	// 	// out_uvs     .push_back(uv);
-	// 	// out_normals .push_back(normal);
-
-    //     // Vertices.push_back(Vertex{.Position = vertex, .Normal = normal, .TexCoords = uv});
-	
-	// }
 	fclose(file);
 
     for (auto &&x : temp_vertices) {
@@ -171,5 +143,5 @@ Mesh loadOBJ(const char * path) {
     return Mesh{Vertices, vertexIndices, IsTriangulated};
 }
 
-
+} // namespace mdl
 #endif

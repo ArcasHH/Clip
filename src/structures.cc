@@ -1,6 +1,13 @@
 #include "structures.h"
 #include "obj_parser.h"
 
+Flat getFlat(){
+    Flat f;
+    std::cin >> f.n.x >> f.n.y >> f.n.z;
+    std::cin >> f.p.x >> f.p.y >> f.p.z;
+    return f;
+}
+
 float PointInFlat (Vertex const &p, Flat const &f){//подставление координат точки в ур.плоскости
     return f.n.x * p.x + f.n.y * p.y + f.n.z * p.z + f.D();
 }
@@ -82,6 +89,7 @@ void DeleteVertex(Mesh &m, Vertex &v){
                 for(int j = i + 1; j < m.Vertices.size() ; ++j)
                     m.Vertices[j - 1] = m.Vertices[ j ];
             */
+
         }
 }
 
@@ -127,9 +135,41 @@ void PushIndex(Face &f, int index, int j){//вставка индекса нов
     
 }
 
+bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2){
+    if(Vector(v, v1).normalize() == Vector(v2, v1).normalize())
+        return true;
+    return false;
+}
+
+void DeleteDuplicateVertecies(Mesh &m, std::vector<int> arr){
+    std::vector<int> d;
+    for(int i =0; i < arr.size() - 1; ++i)
+        for(int j = i + 1; j < arr.size(); ++j)
+
+            if(m.Vertices[arr[i]] == m.Vertices[arr[j]]){ //сравнение с погрешностью
+                DeleteVertex(m, m.Vertices[arr[j]]);
+                d.push_back(arr[j]);
+                for(int j =0; j < m.Faces.size(); ++j)
+                    for( int n = 0; n <3; ++n)
+                        if(m.Faces[j].Indices[n] == arr[j])
+                            m.Faces[j].Indices[n] = arr[i];
+            }
+    
+    for(int i =0; i < d.size() - 1; ++i)
+        for(int j = 0; j < arr.size(); ++j)
+            if (d[i] == arr[j])
+                arr.erase(arr.begin() + j - 1);
+}
+
 std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//упорядочивание вершин в порядке обхода сечения
     std::vector<Vertex> tries;
     Vector norm = f.n.normalize();
+
+    for(int i = 1; i < intersect.size() + 1; ++i){
+        if(isOnLine(intersect[i % intersect.size()], intersect[i-1], intersect[(i+1) % intersect.size()])){
+            intersect.erase(intersect.begin() + i - 1);
+        }
+    }
 
     int num_of_triangles = 0; //количество треугольников, на которые разбивается сечение
     for(int i = intersect.size() - 2; i>0; i--){
@@ -150,6 +190,7 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
                 arr[j-1]++;
         }
     }
+    
 
     for(int j = 2; j <= intersect.size(); j++){ //tries - список вершин новой грани в порядке обхода. (сортировка)
         for(int i=0; i < intersect.size() - 1; ++i){
@@ -160,33 +201,38 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
     return tries;
 }
 
+void SpecialCases(Mesh &m, Flat const &f){
+    int zero = OnPoints(m, f);//количество вершин объекта, лежащих на плоскости
+    int sum = InPoints(m, f) - OutPoints(m, f);//cумма codes. нужно для определения крайних/вырожденных случаев
+
+    if((sum == - (m.Vertices.size() - zero)) ){//случаи, где результат - пустое множество
+        std::cerr << "Empty intersect " << std::endl;
+        //можно отрисовать пустой экран
+    }
+    if((sum == (m.Vertices.size() - zero)) ){// случаи, когда результат - исходный объект
+        std::cerr << "the object will not change " << std::endl;
+        //отрисовка исходного меша
+    }
+}
+
 
 Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     Mesh m{m_in};
 
     int index = m.Vertices.size();//индексы новых вершин
-    int zero = OnPoints(m, f);//количество вершин объекта, лежащих на плоскости
-    int sum = InPoints(m, f) - OutPoints(m, f);//cумма codes. нужно для определения крайних/вырожденных случаев
-
     Face new_face;
-    m.Faces.push_back(new_face);
-    
-    if((sum == - (m.Vertices.size() - zero)) ){//случаи, где результат - пустое множество
-        std::cerr << "Empty intersect " << std::endl;
-        return m;
-    }
-    if((sum == (m.Vertices.size() - zero)) ){// случаи, когда результат - исходный объект
-        return m;
-    }
 
     std::vector<Vertex> intersect; //points of intersect
     for(int i = 0; i < m.Faces.size(); ++i){//для каждой грани
         int out = 0;
 
         for(int j =0; j < m.Faces[i].Indices.size(); ++j){//обходим каждую вершину грани
+
             if(m.Vertices[m.Faces[i].Indices[j]].c == -1){
                 out++;
             }
+            
+
             if(m.Vertices[m.Faces[i].Indices[j]].c == 0){
                 intersect.push_back(m.Vertices[m.Faces[i].Indices[j]]);
             }
@@ -199,8 +245,9 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
                 r.c = 0;//ON
                 intersect.push_back(r);
                 m.Vertices.push_back(r);
+                new_face.Indices.push_back(index);
                 
-                PushIndex(m.Faces[i], index, j);
+                PushIndex(m.Faces[i], index, j);// вставка значения index на место j
                 index++;
             }
         }
@@ -209,6 +256,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         if(out == 4)
             DeleteFace(m, m.Faces[i]);
     }
+    DeleteDuplicateVertecies(m, new_face.Indices);
     
     intersect = tries(intersect, f);//вектор вершин в нужном порядке для новой грани
     for(int i = 0; i<intersect.size(); ++i){
@@ -218,4 +266,17 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     m.Faces.push_back(new_face);
 
     return m;
+}
+
+void Triangulation(Mesh &m){
+    for(int i = 0; i < m.Faces.size(); ++i){
+        if(m.Faces[i].Indices.size() == 4){ // тк модель триангулированная изначально, то кроме сечения максимум 4 индекса у грани
+            Face new_face;
+            for(int j = 0; j < 3; ++j){
+                new_face.Indices.push_back(m.Faces[i].Indices[j]);
+                m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + 1);
+            }
+            m.Faces.push_back(new_face);
+        }
+    }
 }

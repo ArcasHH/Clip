@@ -70,15 +70,17 @@ inline Vector operator+(Vector const &B, Vector const &A) {
     v.z = B.z + A.z;
     return v;
 }
-inline bool operator==(Vector const &B, Vector const &A) {
-    return B.x == A.x && B.y == A.y && B.z == A.z;
-}
 
 // C = A - B; -> A = .operator-(A, B)
 inline Vector operator-(Vector const &B, Vector const &A) {
     Vector v{B};
     v -= A;
     return v;
+}
+
+inline bool operator==(Vector const &B, Vector const &A) {//с погрешностью в 1%
+    Vector dA = A * 0.01;
+    return ((A.x - dA.x < B.x &&  B.x < A.x + dA.x) && (A.y - dA.y < B.y &&  B.y < A.y + dA.y) && (A.z - dA.z < B.z &&  B.z < A.z + dA.z));
 }
 
 struct Segment {
@@ -148,6 +150,8 @@ struct Mesh {
     }
 };
 
+Flat getFlat();
+
 float ScalarProduct(Vector &v1, Vector &v2);
 
 Vector VectorProduct(Vector &v1, Vector &v2);
@@ -156,9 +160,13 @@ float PointInFlat (Vertex const &p, Flat const &f);
 
 int getVertexIndex(Vertex const &v, Mesh const &m);
 
-void PointClassify(Vertex &p, Flat &f);
+void PointClassify(Mesh &m, Flat const &f);
 
 void DeleteVertex(Mesh &m, Vertex &v);
+
+bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2);
+
+void DeleteDuplicateVertecies(Mesh &m, Vertex &v);
 
 void DeleteIndexes(Mesh &m, Face &f, int code);
 
@@ -170,4 +178,8 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f);
 
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f);
 
+void SpecialCases(Mesh &m, Flat const &f);
+
 Mesh ResultOfIntersect( Mesh &m, Flat &f);
+
+void Triangulation(Mesh &m);
