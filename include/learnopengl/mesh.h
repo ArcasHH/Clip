@@ -60,6 +60,8 @@ public:
         unsigned int normalNr   = 1;
         unsigned int heightNr   = 1;
 
+        // shader.setVec3("oColor", 1.0f, 0.5f, 0.31f);
+
         // draw mesh
         glBindVertexArray(VAO);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
