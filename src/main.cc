@@ -87,11 +87,52 @@ int main()
     mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\cube.obj");
 
     // PLANE
-    // Flat plane = getFlat();
-    // PointClassify(m, plane);
-    // SpecialCases(m, plane);
-    // Mesh res = ResultOfIntersect(m, plane);
-    // Triangulation(res);
+
+    mdl::Mesh mesh = ourModel.meshes[0];
+
+    Mesh m;
+    for(int i = 0; i<mesh.vertices.size(); ++i){
+        Vertex v;
+        v.x = mesh.vertices[i].Position.x;
+        v.y = mesh.vertices[i].Position.y;
+        v.z = mesh.vertices[i].Position.z;
+        m.Vertices.push_back(v);
+    }
+    for(int i = 0; i < mesh.indices.size()/3 ; i +=3){
+        Face new_face;
+        for(int n = 0; n<3; ++n)
+            new_face.Indices[n] = mesh.indices[i + n];
+        m.Faces.push_back(new_face);
+    }
+
+    Flat plane;
+    plane.p = {{0}, {0}, {0}};
+    plane.n = {{0}, {1}, {0}};
+
+    PointClassify(m, plane);
+    SpecialCases(m, plane);
+    Mesh res = ResultOfIntersect(m, plane);
+    Triangulation(res);
+
+    std::vector<mdl::Vertex> ver;
+    for(int i =0; i < res.Vertices.size(); ++i){
+        mdl::Vertex v;
+        v.Position = {{res.Vertices[i].x}, {res.Vertices[i].y}, {res.Vertices[i].z}};
+        v.Normal = {{0}, {1}, {0}};
+        ver.push_back(v);
+    }
+    std::vector<unsigned int> indices;
+    for(int i =0; i < m.Faces.size(); ++i){
+        for( int j = 0; j < m.Faces[i].Indices.size(); ++j){
+            indices.push_back(m.Faces[i].Indices[j]);
+        }
+    }
+
+    mdl::Mesh new_res = {{ver}, {indices}, true};
+
+    ourModel.meshes[0] = new_res;
+
+
 
     // Function interface
     // Model Clip(Model const&M, Plane const &P) {

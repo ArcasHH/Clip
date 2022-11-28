@@ -98,7 +98,7 @@ struct Face {
     int &operator[] (int pos) { return Indices.at(pos); }
 };
 
-inline bool operator==(Face const &f1, Face const &f2) {
+inline bool operator==(Face const &f1, Face const &f2){
     if(f1.Indices.size() == f2.Indices.size()){
         for(int i = 0; i < f1.Indices.size(); ++i){
             for (int j = 0; j < f2.Indices.size(); ++j)
@@ -109,6 +109,7 @@ inline bool operator==(Face const &f1, Face const &f2) {
         }
         return true;
     }
+    return false;
 }
 
 struct Flat {
@@ -180,6 +181,6 @@ Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f);
 
 void SpecialCases(Mesh &m, Flat const &f);
 
-Mesh ResultOfIntersect( Mesh &m, Flat &f);
+Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f);
 
 void Triangulation(Mesh &m);

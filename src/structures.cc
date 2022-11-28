@@ -79,7 +79,7 @@ int getVertexIndex(Vertex const &v, Mesh const &m){ //vector.find
 void DeleteVertex(Mesh &m, Vertex &v){
     for(int i =0; i < m.Vertices.size(); ++i) //удаление 1 вершины из списка объекта//////////////////////////////
         if( m.Vertices[i] == v){
-             m.Vertices.erase(m.Vertices.begin() + i - 1);
+             m.Vertices.erase(m.Vertices.begin() + i);
             /*
             if (i == m.Vertices.size() - 1){
                 m.Vertices.pop_back();
@@ -96,7 +96,7 @@ void DeleteVertex(Mesh &m, Vertex &v){
 void DeleteFace(Mesh &m, Face &f){  //удаление грани из списка
 for(int i = 0; i<m.Faces.size(); i++)
     if (m.Faces[i] == f){
-        m.Faces.erase(m.Faces.begin() + i - 1);
+        m.Faces.erase(m.Faces.begin() + i);
         /*
         if (i == m.Faces.size() - 1){
             m.Faces.pop_back();
@@ -112,7 +112,7 @@ for(int i = 0; i<m.Faces.size(); i++)
 void DeleteIndexes(Mesh &m, Face &f, int code){
     for(int i =0; i < f.Indices.size(); ++i) //удаление вершины из списка грани
         if( m.Vertices[f.Indices[i]].c == code)
-                f.Indices.erase(f.Indices.begin() + i - 1);
+                f.Indices.erase(f.Indices.begin() + i);
 }
 
 
@@ -165,9 +165,9 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
     std::vector<Vertex> tries;
     Vector norm = f.n.normalize();
 
-    for(int i = 1; i < intersect.size() + 1; ++i){
+    for(int i = 1; i < intersect.size() + 1; ++i){//удаление несущественных вершин
         if(isOnLine(intersect[i % intersect.size()], intersect[i-1], intersect[(i+1) % intersect.size()])){
-            intersect.erase(intersect.begin() + i - 1);
+            intersect.erase(intersect.begin() + i);
         }
     }
 
@@ -200,6 +200,7 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
     }
     return tries;
 }
+
 
 void SpecialCases(Mesh &m, Flat const &f){
     int zero = OnPoints(m, f);//количество вершин объекта, лежащих на плоскости
@@ -262,7 +263,6 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     for(int i = 0; i<intersect.size(); ++i){
         new_face.Indices.push_back(getVertexIndex(intersect[i], m));
     }
-    
     m.Faces.push_back(new_face);
 
     return m;
@@ -270,13 +270,14 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
 
 void Triangulation(Mesh &m){
     for(int i = 0; i < m.Faces.size(); ++i){
-        if(m.Faces[i].Indices.size() == 4){ // тк модель триангулированная изначально, то кроме сечения максимум 4 индекса у грани
-            Face new_face;
-            for(int j = 0; j < 3; ++j){
-                new_face.Indices.push_back(m.Faces[i].Indices[j]);
-                m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + 1);
+        if(m.Faces[i].Indices.size() > 3)
+            
+            for(int j = 0; j < m.Faces[i].Indices.size() - 1; j += 2){
+                Face new_face;
+                for( int n = 0; n < 3; ++n)
+                    new_face.Indices.push_back(m.Faces[i].Indices[j + n]);
+                m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + j + 1);
+                m.Faces.push_back(new_face);
             }
-            m.Faces.push_back(new_face);
-        }
     }
 }
