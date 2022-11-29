@@ -79,9 +79,9 @@ inline Vector operator-(Vector const &B, Vector const &A) {
 }
 
 inline bool operator==(Vector const &B, Vector const &A) {//с погрешностью в 1%
-    Vector dA = A * 0.01;
-    return ((A.x - dA.x < B.x &&  B.x < A.x + dA.x) && (A.y - dA.y < B.y &&  B.y < A.y + dA.y) && (A.z - dA.z < B.z &&  B.z < A.z + dA.z));
-}
+    float e = 0.01;
+    return (abs(A.x - B.x) < e && abs(A.y - B.y) < e && abs(A.z - B.z) < e);
+}// (A.x - dA.x < B.x &&  B.x < A.x + dA.x) && (A.y - dA.y < B.y &&  B.y < A.y + dA.y) && (A.z - dA.z < B.z &&  B.z < A.z + dA.z)
 
 struct Segment {
     Vertex A;
@@ -167,7 +167,8 @@ void DeleteVertex(Mesh &m, Vertex &v);
 
 bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2);
 
-void DeleteDuplicateVertecies(Mesh &m, Vertex &v);
+std::vector<int> DuplicateVertecies(Mesh &m, Vertex &v);
+void DeleteDuplicates(Mesh &m);
 
 void DeleteIndexes(Mesh &m, Face &f, int code);
 

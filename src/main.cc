@@ -91,28 +91,37 @@ int main()
     mdl::Mesh mesh = ourModel.meshes[0];
 
     Mesh m;
-    for(int i = 0; i<mesh.vertices.size(); ++i){
+    for(int i = 0; i  <mesh.vertices.size(); ++i){
         Vertex v;
         v.x = mesh.vertices[i].Position.x;
         v.y = mesh.vertices[i].Position.y;
         v.z = mesh.vertices[i].Position.z;
         m.Vertices.push_back(v);
     }
-    for(int i = 0; i < mesh.indices.size()/3 ; i +=3){
+
+    for(int i = 0; i < mesh.indices.size() ; i +=3 ){
         Face new_face;
-        for(int n = 0; n<3; ++n)
-            new_face.Indices[n] = mesh.indices[i + n];
+        for(int n = 0; n < 3; ++n){
+            new_face.Indices.push_back(mesh.indices[i + n]) ;
+        }
+       
         m.Faces.push_back(new_face);
     }
+
 
     Flat plane;
     plane.p = {{0}, {0}, {0}};
     plane.n = {{0}, {1}, {0}};
 
+
     PointClassify(m, plane);
+
     SpecialCases(m, plane);
+    std::cout << "ASD" << std::endl;//1
     Mesh res = ResultOfIntersect(m, plane);
+    std::cout << "ASD" << std::endl;//2
     Triangulation(res);
+    std::cout << "ASD" << std::endl;//3
 
     std::vector<mdl::Vertex> ver;
     for(int i =0; i < res.Vertices.size(); ++i){
@@ -121,16 +130,20 @@ int main()
         v.Normal = {{0}, {1}, {0}};
         ver.push_back(v);
     }
+    std::cout << "ASD" << std::endl;//4
     std::vector<unsigned int> indices;
     for(int i =0; i < m.Faces.size(); ++i){
         for( int j = 0; j < m.Faces[i].Indices.size(); ++j){
             indices.push_back(m.Faces[i].Indices[j]);
         }
     }
+    std::cout << "ASD" << std::endl;//5
 
     mdl::Mesh new_res = {{ver}, {indices}, true};
+    std::cout << "ASD" << std::endl;//6
 
     ourModel.meshes[0] = new_res;
+    std::cout << "ASD" << std::endl;//7
 
 
 
