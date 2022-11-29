@@ -132,9 +132,9 @@ int main()
     }
     std::cout << "ASD" << std::endl;//4
     std::vector<unsigned int> indices;
-    for(int i =0; i < m.Faces.size(); ++i){
-        for( int j = 0; j < m.Faces[i].Indices.size(); ++j){
-            indices.push_back(m.Faces[i].Indices[j]);
+    for(int i =0; i < res.Faces.size(); ++i){
+        for( int j = 0; j < res.Faces[i].Indices.size(); ++j){
+            indices.push_back(res.Faces[i].Indices[j]);
         }
     }
     std::cout << "ASD" << std::endl;//5

@@ -1,6 +1,8 @@
 #include "structures.h"
 #include "obj_parser.h"
 
+#include <unordered_set>
+
 Flat getFlat(){
     Flat f;
     std::cin >> f.n.x >> f.n.y >> f.n.z;
@@ -116,9 +118,7 @@ void PushIndex(Face &f, int index, int j){//вставка индекса нов
 }
 
 bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2){
-    if(Vector(v, v1).normalize() == Vector(v2, v1).normalize())
-        return true;
-    return false;
+    return Vector(v, v1).normalize() == Vector(v2, v).normalize();
 }
 
 std::vector<int> DuplicateVertecies(Mesh &m, std::vector<int> arr){//удаление по одинаковым индексам
@@ -167,26 +167,38 @@ void DeleteDuplicates(Mesh &m){
 std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//упорядочивание вершин в порядке обхода сечения
     std::vector<Vertex> tries;
     Vector norm = f.n.normalize();
+    std::vector<int> del;
 
-    for(int i = 1; i < intersect.size() + 1; ++i){//удаление несущественных вершин
-        if(isOnLine(intersect[i % intersect.size()], intersect[i-1], intersect[(i+1) % intersect.size()])){
-            intersect.erase(intersect.begin() + i - 1);
+    std::unordered_set<int> unique_id_to_delete;
+    for(int i = 0; i < intersect.size(); ++i)
+        for(int j = 0; j < intersect.size()-1; ++j){
+            if( j != i){
+                for(int k = j+1; k < intersect.size(); ++k){
+                    if(k != i && k != j){
+                        if(isOnLine(intersect[i], intersect[j], intersect[k])){
+                    //i между j и k
+                            unique_id_to_delete.insert(i);
+                            break;
+                        }
+                    }
+                }
+            }
         }
+    
+    std::vector<Vertex> new_vertices;
+    for (int i = 0; i != intersect.size(); ++i) {
+        if (!unique_id_to_delete.count(i))
+            new_vertices.push_back(intersect[i]);
     }
-
-    int num_of_triangles = 0; //количество треугольников, на которые разбивается сечение
-    for(int i = intersect.size() - 2; i>0; i--){
-        num_of_triangles +=i;
-    }
+    intersect = new_vertices;
 
     std::vector<int> arr(intersect.size()-1);//массив - количество появления вершин на второй позиции
     for(int i=0; i<intersect.size() - 1; ++i)
         arr[i] = 0;
-    for( int i = 1; i < intersect.size() - 2; ++i ){
+    for( int i = 1; i < intersect.size() - 1; ++i ){
         for(int j = i + 1; j < intersect.size(); ++j ){
 
             Vector Try = Vector{intersect[0], intersect[i]}.cross(Vector{intersect[i], intersect[j]}).normalize();
-            
             if (Try == norm)
                 arr[i-1]++;
             else if (Try == -norm)
@@ -194,13 +206,19 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
         }
     }
     
+        for (auto &&x: tries) {
+        std::cout << x << '\n';
+    }
 
+    tries.push_back(intersect[0]);
     for(int j = 2; j <= intersect.size(); j++){ //tries - список вершин новой грани в порядке обхода. (сортировка)
         for(int i=0; i < intersect.size() - 1; ++i){
             if(arr[i] == intersect.size() - j)
                 tries.push_back(intersect[i+1]);
         }
     }
+
+
     return tries;
 }
 
@@ -244,7 +262,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
                 Vertex r = Segment_Flat_Intersection(s, f);
                 r.c = 0;//ON
                 m.Vertices.push_back(r);
-                new_face.Indices.push_back(index);
+                //new_face.Indices.push_back(index);
                 
                 PushIndex(m.Faces[i], index, j);// вставка значения index на место j
                 index++;
@@ -271,55 +289,61 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         }
     }
 
-    new_face.Indices = DuplicateVertecies(m, new_face.Indices);
+    std::vector<float> vert;
+
+    //new_face.Indices = DuplicateVertecies(m, new_face.Indices);
+    for(int i = 0; i < m.Vertices.size(); ++i){
+        vert.push_back(m.Vertices[i].x);
+        vert.push_back(m.Vertices[i].y);
+        vert.push_back(m.Vertices[i].z);
+    }
     DeleteDuplicates(m);
     std::vector<int> index_ver_del;//удаление вершин OUT
-    for(int i = 0; i < m.Vertices.size(); ++i)
+    for(int i = 0; i < m.Vertices.size(); ++i){
         if(m.Vertices[i].c == -1){
             index_ver_del.push_back(i);
         }
+    }
+
     for(int j = 0; j < index_ver_del.size(); ++j){
-        //for(int k =0; k < m.Faces.size(); ++k){
-            //for(int n =0; n < m.Faces[k].Indices.size(); ++n){
-            //    if(m.Faces[k].Indices[n] > index_ver_del[j] -j)
-            //        m.Faces[k].Indices[n] --;
-            //}
-        //}
         DeleteVertex(m, m.Vertices[index_ver_del[j] -j]);
     }
-    
-       
 
-    for(int i =0 ;i<m.Vertices.size(); ++i){
-        std::cout << "ver posle:" <<i<< ":   " << m.Vertices[i].x << ' ' << m.Vertices[i].y << ' ' << m.Vertices[i].z << "code:   "<< m.Vertices[i].c<< std::endl;
+
+
+//////////////////////////////////////////////////////////////////
+    for(int j =0; j < m.Faces.size(); ++j)
+            
+        for(int n =0; n < m.Faces[j].Indices.size(); ++n)
+            for(int i = 0; i < vert.size(); i += 3){
+
+                if(m.Faces[j].Indices[n] == i/3){
+                    Vertex v = {{vert[i]}, {vert[i + 1]}, {vert[i + 2]}};
+                    m.Faces[j].Indices[n] = getVertexIndex(v, m);
+                    break;
+                }
+            }
+
+    for(int i =0; i < m.Vertices.size(); ++i){//индексы сечения
+        if(m.Vertices[i].c == 0){
+            new_face.Indices.push_back(i);
+        }
     }
-
-
-for(int i =0; i < m.Faces.size(); ++i){
-    std::cout <<"face " << i <<"ty"<< m.Faces[i].Indices.size()<< ":   " ;
-    for( int j = 0; j<m.Faces[i].Indices.size(); ++j){
-        std::cout << ' '<< m.Faces[i].Indices[j] << ' ';
-    }
-    std::cout  << std::endl;
-}
-
-
-
 
 
     for (int i = 0; i < new_face.Indices.size(); ++i){
         intersect.push_back(m.Vertices[new_face.Indices[i]]);
-        //std:: cout << "new   " << ":   "<< new_face.Indices[i] << std::endl;
     }
 
     intersect = tries(intersect, f);//вектор вершин в нужном порядке для новой грани
 
-
-    for(int i = 0; i<intersect.size(); ++i){
-        new_face.Indices.push_back(getVertexIndex(intersect[i], m));
+    Face face_intersect;
+    for(int i =0; i < intersect.size(); ++i){
+        face_intersect.Indices.push_back(getVertexIndex(intersect[i], m));
     }
 
-    m.Faces.push_back(new_face);
+
+    m.Faces.push_back(face_intersect);
 
     return m;
 }
@@ -336,4 +360,21 @@ void Triangulation(Mesh &m){
                 m.Faces.push_back(new_face);
             }
     }
+    /*
+    for(int i =0; i < m.Vertices.size(); ++i){
+        std::cout << "vert: "<< i <<"  ";
+        std::cout <<  ' '<< m.Vertices[i].x << ' '<<  ' '<< m.Vertices[i].y <<  ' '<< m.Vertices[i].z <<std:: endl;
+    }
+    std::cout << std:: endl;
+
+    for(int i =0; i < m.Faces.size(); ++i){
+        std::cout << "face: "<< i <<"  ";
+        for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
+            std::cout <<  ' '<< m.Faces[i].Indices[j]<< ' ';
+        }
+        std::cout << std:: endl;
+    }
+    std::cout << std:: endl;
+    */
+
 }
