@@ -26,11 +26,12 @@ struct Vector {
     Vector normalize() const { float const len = length(); return Vector{x / len, y / len, z / len};   }
 
     // -A; -> A.operator-()
-    Vector &operator-() {
-        x = -x;
-        y = -y;
-        z = -z;
-        return *this;
+    Vector operator-() {
+        Vector tmp;
+        tmp.x = -x;
+        tmp.y = -y;
+        tmp.z = -z;
+        return tmp;
     }
 
     // B -= V -> B.operator(V)

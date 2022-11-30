@@ -17,11 +17,12 @@ float PointInFlat (Vertex const &p, Flat const &f){//подставление к
 
 void  PointClassify(Mesh &m , Flat const &f){//классификация точек тела относительно плоскости
 
+
     for(int i =0; i<m.Vertices.size(); ++i){
         if( PointInFlat(m.Vertices[i], f) < 0){//IN
             m.Vertices[i].c = 1;
         }
-        else if( -0.0001 < PointInFlat(m.Vertices[i], f) < 0.0001){//ON
+        else if( -0.0001 < PointInFlat(m.Vertices[i], f) && PointInFlat(m.Vertices[i], f) < 0.0001){//ON
             m.Vertices[i].c = 0;
         }
         else if( PointInFlat(m.Vertices[i], f) > 0){//OUT
@@ -133,8 +134,6 @@ std::vector<int> DuplicateVertecies(Mesh &m, std::vector<int> arr){//удале�
         }
 
     for(int i = 0; i < d.size(); ++i){
-        //DeleteVertex(m, m.Vertices[d[i]]);
-        //std::cout << "deleted vertex:   "<< m.Vertices[d[i]].x <<' ' << m.Vertices[d[i]].y <<' ' << m.Vertices[d[i]].z<<' '<<std::endl;
         for(int n = 0; n < m.Faces.size(); ++n)
             for(int k = 0; k < m.Faces[n].Indices.size(); ++k){
                 if(m.Faces[n].Indices[k] == d[i])
@@ -151,14 +150,9 @@ void DeleteDuplicates(Mesh &m){
         for(int j = i + 1; j < m.Vertices.size(); ++j)
             if(m.Vertices[i] == m.Vertices[j]){
                 duplicates.push_back(j);
-                std::cout << "dupl:  " << j << std::endl;
-                std::cout << "ver  i:  " << i << ' '<<"u  "<< m.Vertices[i].x<<' '  <<  m.Vertices[i].y<<' ' <<  m.Vertices[i].z<<std::endl;
-                std::cout << "ver  j:  " <<j <<' ' <<"u  "<< m.Vertices[j].x<<' '  <<  m.Vertices[j].y<<' ' <<  m.Vertices[j].z<<std::endl;
-                std::cout << " divvvvvvvvvvv         "<< m.Vertices[i].x - m.Vertices[j].x <<' '<<   m.Vertices[i].y - m.Vertices[j].y <<' ' << m.Vertices[i].z - m.Vertices[j].z <<std::endl; 
             }
                 
     for(int i = 0; i < duplicates.size(); ++i){
-        std::cout << "sized   "<< duplicates[i] << std::endl;;
         DeleteVertex(m, m.Vertices[duplicates[i] - i]);
     }
 }
@@ -196,20 +190,23 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
     std::vector<int> arr(intersect.size()-1);//массив - количество появления вершин на второй позиции
     for(int i=0; i<intersect.size() - 1; ++i)
         arr[i] = 0;
+
+
     for( int i = 1; i < intersect.size() - 1; ++i ){
         for(int j = i + 1; j < intersect.size(); ++j ){
 
             Vector Try = Vector{intersect[0], intersect[i]}.cross(Vector{intersect[i], intersect[j]}).normalize();
-            if (Try == norm)
+            if (Try == norm){
                 arr[i-1]++;
-            else if (Try == -norm)
+            }
+
+            else if (Try == -norm){
                 arr[j-1]++;
+            }
+
         }
     }
-    
-        for (auto &&x: tries) {
-        std::cout << x << '\n';
-    }
+
 
     tries.push_back(intersect[0]);
     for(int j = 2; j <= intersect.size(); j++){ //tries - список вершин новой грани в порядке обхода. (сортировка)
@@ -218,7 +215,6 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
                 tries.push_back(intersect[i+1]);
         }
     }
-
 
     return tries;
 }
@@ -317,23 +313,6 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
 
     DeleteDuplicates(m);
 
-        
-    for(int i =0; i < m.Vertices.size(); ++i){
-        std::cout << "vert: "<< i <<"  ";
-        std::cout <<  ' '<< m.Vertices[i].x << ' '<<  ' '<< m.Vertices[i].y <<  ' '<< m.Vertices[i].z << "  c:   "<<m.Vertices[i].c <<std:: endl;
-    }
-    std::cout << std:: endl;
-
-    for(int i =0; i < m.Faces.size(); ++i){
-        std::cout << "face: "<< i <<"  ";
-        for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
-            std::cout <<  ' '<< m.Faces[i].Indices[j]<< ' ';
-        }
-        std::cout << std:: endl;
-    }
-    std::cout << std:: endl;
-
-
 
     std::vector<int> index_ver_del;//удаление вершин OUT
     for(int i = 0; i < m.Vertices.size(); ++i){
@@ -343,11 +322,10 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     }
 
 
-
-
     for(int j = 0; j < index_ver_del.size(); ++j){
         DeleteVertex(m, m.Vertices[index_ver_del[j] -j]);
     }
+
 
 
 
@@ -375,7 +353,10 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         intersect.push_back(m.Vertices[new_face.Indices[i]]);
     }
 
+
+
     intersect = tries(intersect, f);//вектор вершин в нужном порядке для новой грани
+
 
     Face face_intersect;
     for(int i =0; i < intersect.size(); ++i){
@@ -385,36 +366,98 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
 
     m.Faces.push_back(face_intersect);
 
+
+
     return m;
 }
 
-void Triangulation(Mesh &m){
-    for(int i = 0; i < m.Faces.size(); ++i){
-        if(m.Faces[i].Indices.size() > 3)
-            
-            for(int j = 0; j < m.Faces[i].Indices.size() - 1; j += 2){
-                Face new_face;
-                for( int n = 0; n < 3; ++n)
-                    new_face.Indices.push_back(m.Faces[i].Indices[j + n]);
-                m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + j + 1);
-                m.Faces.push_back(new_face);
-            }
-    }
-    /*
+void Triangulation(Mesh &m) {
+
+
+    
     for(int i =0; i < m.Vertices.size(); ++i){
-        std::cout << "vert: "<< i <<"  ";
-        std::cout <<  ' '<< m.Vertices[i].x << ' '<<  ' '<< m.Vertices[i].y <<  ' '<< m.Vertices[i].z <<std:: endl;
+        std::cout << "vert do  : "<< i <<"  ";
+        std::cout <<  ' '<< m.Vertices[i].x << ' '<<  ' '<< m.Vertices[i].y <<  ' '<< m.Vertices[i].z  << "  c:   "<< m.Vertices[i].c<<std:: endl;
     }
     std::cout << std:: endl;
 
     for(int i =0; i < m.Faces.size(); ++i){
-        std::cout << "face: "<< i <<"  ";
+        std::cout << "face do  : "<< i <<"  ";
         for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
             std::cout <<  ' '<< m.Faces[i].Indices[j]<< ' ';
         }
         std::cout << std:: endl;
     }
-    std::cout << std:: endl;
-    */
 
+    // for (auto &&face : m.Faces) {
+    //     if (face.Indices.size() > 3) {
+    //         std::vector<int> index;
+    //         for (int j = 0; j < face.Indices.size() - 1; j += 2) {
+    //             Face new_face;
+    //             for (int n = 0; n < 3; ++n)
+    //                 new_face.Indices.push_back(face.Indices[(j + n) % face.Indices.size()]);
+    //             index.push_back(j + 1);
+    //             m.Faces.push_back(new_face);
+    //         }
+    //         for(int k =index.size()-1; k >=0 ; k--){
+    //             face.Indices.erase(face.Indices.begin() + index[k]);
+    //     }
+    //     }
+    // }
+    std::vector<int> index;
+    std::cout<<"size "<<m.Faces.size()<<'\n';
+    for(int i = 0; i < m.Faces.size() ; ++i){
+        if(m.Faces[i].Indices.size() < 3){
+            index.push_back(i);
+       }
+    }
+    for(int i = 0; i < index.size(); ++i){
+        std::cout<<"to delete   "<< index[i] << ' ';
+        m.Faces.erase(m.Faces.begin() + index[i] - i);
+    }
+
+    int faces = m.Faces.size();
+    for(int i = 0; i < faces ; ++i){
+
+        if(m.Faces[i].Indices.size() == 3) continue;
+
+        std::vector<int> index;
+        for(int j = 0; j < m.Faces[i].Indices.size() - 1; j += 2){
+            Face new_face;
+            for( int n = 0; n < 3; ++n)
+                new_face.Indices.push_back(m.Faces[i].Indices[(j + n)%m.Faces[i].Indices.size()]);
+            index.push_back(j+1);
+            //m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + j + 1);
+            m.Faces.push_back(new_face);
+        }
+        //for(int k =index.size()-1; k >=0 ; k--){
+        //    m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + index[k]);
+        //}
+        if(m.Faces[i].Indices.size() == 4)
+            m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + 1);
+        else if(m.Faces[i].Indices.size() == 5){
+            m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + 3);
+            m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + 1);
+        }
+        else if(m.Faces[i].Indices.size() == 6){
+            m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + 5);
+            m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + 3);
+            m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + 1);
+        }
+            
+    }
+
+    for(int i =0; i < m.Vertices.size(); ++i){
+        std::cout << "vert  : "<< i <<"  ";
+        std::cout <<  ' '<< m.Vertices[i].x << ' '<<  ' '<< m.Vertices[i].y <<  ' '<< m.Vertices[i].z  << "  c:   "<< m.Vertices[i].c<<std:: endl;
+    }
+    std::cout << std:: endl;
+
+    for(int i =0; i < m.Faces.size(); ++i){
+        std::cout << "face  : "<< i <<"  ";
+        for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
+            std::cout <<  ' '<< m.Faces[i].Indices[j]<< ' ';
+        }
+        std::cout << std:: endl;
+    }
 }

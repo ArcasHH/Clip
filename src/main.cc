@@ -110,11 +110,14 @@ int main()
 
 
     Flat plane;
-    plane.p = {{0}, {0}, {2}};
-    plane.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    plane.p = {{0.5}, {0.5}, {0}};
+    plane.n = Vector{{1}, {1}, {2}}.normalize();
     std::cout << plane.D() << std::endl;
 
+
+
     PointClassify(m, plane);
+
 
     SpecialCases(m, plane);
     Mesh res = ResultOfIntersect(m, plane);
