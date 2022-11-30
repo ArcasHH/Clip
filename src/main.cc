@@ -110,18 +110,16 @@ int main()
 
 
     Flat plane;
-    plane.p = {{0}, {0}, {0}};
-    plane.n = {{0}, {1}, {0}};
-
+    plane.p = {{0}, {0}, {2}};
+    plane.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    std::cout << plane.D() << std::endl;
 
     PointClassify(m, plane);
 
     SpecialCases(m, plane);
-    std::cout << "ASD" << std::endl;//1
     Mesh res = ResultOfIntersect(m, plane);
-    std::cout << "ASD" << std::endl;//2
+
     Triangulation(res);
-    std::cout << "ASD" << std::endl;//3
 
     std::vector<mdl::Vertex> ver;
     for(int i =0; i < res.Vertices.size(); ++i){
@@ -130,20 +128,16 @@ int main()
         v.Normal = {{0}, {1}, {0}};
         ver.push_back(v);
     }
-    std::cout << "ASD" << std::endl;//4
     std::vector<unsigned int> indices;
     for(int i =0; i < res.Faces.size(); ++i){
         for( int j = 0; j < res.Faces[i].Indices.size(); ++j){
             indices.push_back(res.Faces[i].Indices[j]);
         }
     }
-    std::cout << "ASD" << std::endl;//5
 
     mdl::Mesh new_res = {{ver}, {indices}, true};
-    std::cout << "ASD" << std::endl;//6
-
     ourModel.meshes[0] = new_res;
-    std::cout << "ASD" << std::endl;//7
+
 
 
 

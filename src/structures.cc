@@ -58,7 +58,6 @@ int OutPoints(Mesh const &m , Flat const &f){//Количество точек o
     return out;
 }
 
-
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f){//точка пересечения плоскости и отрезка
     if(PointInFlat(s.A,f) * PointInFlat(s.B,f) < 0) {
         Vertex p = s.A - s.B; 
@@ -150,14 +149,16 @@ void DeleteDuplicates(Mesh &m){
     std::vector<int> duplicates;
     for(int i = 0; i < m.Vertices.size() - 1; ++i)
         for(int j = i + 1; j < m.Vertices.size(); ++j)
-            if(m.Vertices[i] == m.Vertices[j])
+            if(m.Vertices[i] == m.Vertices[j]){
                 duplicates.push_back(j);
+                std::cout << "dupl:  " << j << std::endl;
+                std::cout << "ver  i:  " << i << ' '<<"u  "<< m.Vertices[i].x<<' '  <<  m.Vertices[i].y<<' ' <<  m.Vertices[i].z<<std::endl;
+                std::cout << "ver  j:  " <<j <<' ' <<"u  "<< m.Vertices[j].x<<' '  <<  m.Vertices[j].y<<' ' <<  m.Vertices[j].z<<std::endl;
+                std::cout << " divvvvvvvvvvv         "<< m.Vertices[i].x - m.Vertices[j].x <<' '<<   m.Vertices[i].y - m.Vertices[j].y <<' ' << m.Vertices[i].z - m.Vertices[j].z <<std::endl; 
+            }
+                
     for(int i = 0; i < duplicates.size(); ++i){
-        //for(int k =0; k < m.Faces.size(); ++k)
-        //    for(int n =0; n < m.Faces[k].Indices.size(); ++n){
-        //        if(m.Faces[k].Indices[n] > duplicates[i] - i)
-        //            m.Faces[k].Indices[n] --;
-        //}
+        std::cout << "sized   "<< duplicates[i] << std::endl;;
         DeleteVertex(m, m.Vertices[duplicates[i] - i]);
     }
 }
@@ -240,11 +241,19 @@ void SpecialCases(Mesh &m, Flat const &f){
 
 Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
 
+    
+
     Mesh m{m_in};
     int index = m.Vertices.size();//индексы новых вершин
     Face new_face;
     std::vector<int> face_del;
     std::vector<Vertex> intersect; //points of intersect
+
+
+
+
+
+    
 
     for(int i = 0; i < m.Faces.size(); ++i){//для каждой грани
         int out = 0;
@@ -276,6 +285,9 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         }      
 
     }
+
+
+
     
 
     for(int i = 0; i < face_del.size(); ++i){
@@ -289,6 +301,9 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         }
     }
 
+
+    
+
     std::vector<float> vert;
 
     //new_face.Indices = DuplicateVertecies(m, new_face.Indices);
@@ -297,13 +312,38 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         vert.push_back(m.Vertices[i].y);
         vert.push_back(m.Vertices[i].z);
     }
+
+
+
     DeleteDuplicates(m);
+
+        
+    for(int i =0; i < m.Vertices.size(); ++i){
+        std::cout << "vert: "<< i <<"  ";
+        std::cout <<  ' '<< m.Vertices[i].x << ' '<<  ' '<< m.Vertices[i].y <<  ' '<< m.Vertices[i].z << "  c:   "<<m.Vertices[i].c <<std:: endl;
+    }
+    std::cout << std:: endl;
+
+    for(int i =0; i < m.Faces.size(); ++i){
+        std::cout << "face: "<< i <<"  ";
+        for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
+            std::cout <<  ' '<< m.Faces[i].Indices[j]<< ' ';
+        }
+        std::cout << std:: endl;
+    }
+    std::cout << std:: endl;
+
+
+
     std::vector<int> index_ver_del;//удаление вершин OUT
     for(int i = 0; i < m.Vertices.size(); ++i){
         if(m.Vertices[i].c == -1){
             index_ver_del.push_back(i);
         }
     }
+
+
+
 
     for(int j = 0; j < index_ver_del.size(); ++j){
         DeleteVertex(m, m.Vertices[index_ver_del[j] -j]);

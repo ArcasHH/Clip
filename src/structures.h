@@ -79,9 +79,9 @@ inline Vector operator-(Vector const &B, Vector const &A) {
 }
 
 inline bool operator==(Vector const &B, Vector const &A) {//с погрешностью в 1%
-    float e = 0.01;
-    return (abs(A.x - B.x) < e && abs(A.y - B.y) < e && abs(A.z - B.z) < e);
-}// (A.x - dA.x < B.x &&  B.x < A.x + dA.x) && (A.y - dA.y < B.y &&  B.y < A.y + dA.y) && (A.z - dA.z < B.z &&  B.z < A.z + dA.z)
+    float e = 1e-3;
+    return (std::abs(A.x - B.x) < e && std::abs(A.y - B.y) < e && std::abs(A.z - B.z) < e);
+}
 
 struct Segment {
     Vertex A;
