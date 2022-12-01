@@ -89,7 +89,6 @@ int main()
     // PLANE
 
     mdl::Mesh mesh = ourModel.meshes[0];
-
     Mesh m;
     for(int i = 0; i  <mesh.vertices.size(); ++i){
         Vertex v;
@@ -98,7 +97,6 @@ int main()
         v.z = mesh.vertices[i].Position.z;
         m.Vertices.push_back(v);
     }
-
     for(int i = 0; i < mesh.indices.size() ; i +=3 ){
         Face new_face;
         for(int n = 0; n < 3; ++n){
@@ -110,34 +108,26 @@ int main()
 
 
     Flat plane;
-    plane.p = {{0.5}, {0.5}, {0}};
-    plane.n = Vector{{1}, {1}, {2}}.normalize();
+    plane.p = {{0}, {0}, {0}};
+    plane.n = Vector{{-1}, {-1}, {-1}}.normalize();
     std::cout << plane.D() << std::endl;
 
 
-
-    PointClassify(m, plane);
-
-
-    SpecialCases(m, plane);
-    Mesh res = ResultOfIntersect(m, plane);
-
-    Triangulation(res);
+    Intersect(m, plane);
 
     std::vector<mdl::Vertex> ver;
-    for(int i =0; i < res.Vertices.size(); ++i){
+    for(int i =0; i < m.Vertices.size(); ++i){
         mdl::Vertex v;
-        v.Position = {{res.Vertices[i].x}, {res.Vertices[i].y}, {res.Vertices[i].z}};
+        v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
         v.Normal = {{0}, {1}, {0}};
         ver.push_back(v);
     }
     std::vector<unsigned int> indices;
-    for(int i =0; i < res.Faces.size(); ++i){
-        for( int j = 0; j < res.Faces[i].Indices.size(); ++j){
-            indices.push_back(res.Faces[i].Indices[j]);
+    for(int i =0; i < m.Faces.size(); ++i){
+        for( int j = 0; j < m.Faces[i].Indices.size(); ++j){
+            indices.push_back(m.Faces[i].Indices[j]);
         }
     }
-
     mdl::Mesh new_res = {{ver}, {indices}, true};
     ourModel.meshes[0] = new_res;
 

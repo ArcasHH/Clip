@@ -168,7 +168,8 @@ void DeleteVertex(Mesh &m, Vertex &v);
 
 bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2);
 
-std::vector<int> DuplicateVertecies(Mesh &m, Vertex &v);
+std::vector<int> DuplicateVertecies(Mesh &m, std::vector<int> arr);
+
 void DeleteDuplicates(Mesh &m);
 
 void DeleteIndexes(Mesh &m, Face &f, int code);
@@ -186,3 +187,7 @@ void SpecialCases(Mesh &m, Flat const &f);
 Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f);
 
 void Triangulation(Mesh &m);
+
+void Correct(Mesh &m, Flat const &f);
+
+void Intersect(Mesh &m, Flat const &f);
