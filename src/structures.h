@@ -166,9 +166,9 @@ void PointClassify(Mesh &m, Flat const &f);
 
 void DeleteVertex(Mesh &m, Vertex &v);
 
-bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2);
+//bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2);
 
-std::vector<int> DuplicateVertecies(Mesh &m, std::vector<int> arr);
+//std::vector<int> DuplicateVertecies(Mesh &m, std::vector<int> arr);
 
 void DeleteDuplicates(Mesh &m);
 

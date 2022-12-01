@@ -86,9 +86,11 @@ int main()
     // INITIAL TRIANGULATED MODEL
     mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\cube.obj");
 
-    // PLANE
+    // ................................................................................................................................................................
 
-    mdl::Mesh mesh = ourModel.meshes[0];
+
+
+    mdl::Mesh mesh = ourModel.meshes[0];//convert mdl::Mesh to Mesh
     Mesh m;
     for(int i = 0; i  <mesh.vertices.size(); ++i){
         Vertex v;
@@ -107,15 +109,18 @@ int main()
     }
 
 
+
+
     Flat plane;
     plane.p = {{0}, {0}, {0}};
-    plane.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    plane.n = Vector{{1}, {1}, {1}}.normalize();
     std::cout << plane.D() << std::endl;
-
 
     Intersect(m, plane);
 
-    std::vector<mdl::Vertex> ver;
+
+
+    std::vector<mdl::Vertex> ver; //convert Mesh back to mdl::Mesh
     for(int i =0; i < m.Vertices.size(); ++i){
         mdl::Vertex v;
         v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
@@ -132,18 +137,10 @@ int main()
     ourModel.meshes[0] = new_res;
 
 
+    // ................................................................................................................................................................
 
 
-    // Function interface
-    // Model Clip(Model const&M, Plane const &P) {
-    //    ...
-    //    std::vector<Vertex> Vertices = ...
-    //    std::vector<unsigned> Indices = ...
-    //    return Model{Vertices, Indices}; 
-    // }
 
-    
-    // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
