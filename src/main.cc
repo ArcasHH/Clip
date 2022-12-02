@@ -109,20 +109,28 @@ int main()
     }
 
 
+    Flat plane1;
+    plane1.p = {{0}, {0}, {0}};
+    plane1.n = Vector{{1}, {1}, {1}}.normalize();
+    PointClassify(m, plane1);
+    Intersect(m, plane1);
 
 
-    Flat plane;
-    plane.p = {{0}, {0}, {0}};
-    plane.n = Vector{{1}, {1}, {2}}.normalize();
-    //std::cout << plane.D() << std::endl;
+    Flat plane2;
+    plane2.p = {{0}, {0}, {0}};
+    plane2.n = Vector{{0}, {0}, {1}}.normalize();
+    PointClassify(m, plane1);
+    Intersect(m, plane2);
 
-    Intersect(m, plane);
+
+    // Flat plane3;
+    // plane3.p = {{0}, {0}, {0}};
+    // plane3.n = Vector{{0}, {1}, {0}}.normalize();
+
+    // PointClassify(m, plane2);
+    // Intersect(m, plane3);
 
 
-    // Flat plane2;
-    // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{1}, {0}, {0}}.normalize();
-    // Intersect(m, plane2);
 
 
 
@@ -130,7 +138,6 @@ int main()
     for(int i =0; i < m.Vertices.size(); ++i){
         mdl::Vertex v;
         v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
-        //v.Normal = {{1}, {1}, {1}};
         ver.push_back(v);
     }
     for(int i = 0; i < m.Faces.size(); ++i){
@@ -146,7 +153,7 @@ int main()
         }
     }
     bool IsTr = Check(m);
-    std::cout<<"check  "<< IsTr<<std::endl;
+    std::cout<<"is correct  "<< IsTr<<std::endl;
     
     mdl::Mesh new_res = {{ver}, {indices}, true};
     ourModel.meshes[0] = new_res;

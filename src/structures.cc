@@ -212,6 +212,22 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     std::vector<int> face_del;
     std::vector<Vertex> intersect; //points of intersect
 
+
+
+    // for(int i =0; i<m.Vertices.size(); ++i){
+    //     std::cout<< "resssvert  "<< i <<"   "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<std::endl;
+    // }
+
+    // for(int i =0; i < m.Faces.size(); ++i){
+    //     std::cout<< "ressf  "<< i <<"   ";
+    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j){
+    //         std::cout<< m.Faces[i].Indices[j] <<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+
+
+    
     for(int i = 0; i < m.Faces.size(); ++i){
         int out = 0;
         for(int j =0; j < m.Faces[i].Indices.size(); ++j){
@@ -235,6 +251,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         if(out == m.Faces[i].Indices.size() + 1)
             face_del.push_back(i);
     }
+
     
     for(int i = 0; i < face_del.size(); ++i)//удаление граней из меша, все вершины которой OUT
         DeleteFace(m, m.Faces[face_del[i] - i]);
@@ -268,6 +285,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         DeleteVertex(m, m.Vertices[index_ver_del[j] -j]);
     }
 
+
     for(int j =0; j < m.Faces.size(); ++j) 
         for(int n =0; n < m.Faces[j].Indices.size(); ++n)
             for(int i = 0; i < vert.size(); i += 3)
@@ -285,7 +303,6 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         intersect.push_back(m.Vertices[new_face.Indices[i]]);
 
     intersect = tries(intersect, f);//вектор вершин в нужном порядке для новой грани
-
     Face face_intersect;
     for(int i =0; i < intersect.size(); ++i)
         face_intersect.Indices.push_back(getVertexIndex(intersect[i], m));
@@ -298,7 +315,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
 void Triangulation(Mesh &m) {
 
     // for(int i =0; i<m.Vertices.size(); ++i){
-    //     std::cout<< "dovert  "<<i<<"   "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<std::endl;
+    //     std::cout<< "dovert  "<< i <<"   "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<std::endl;
     // }
 
     // for(int i =0; i < m.Faces.size(); ++i){
@@ -322,14 +339,12 @@ void Triangulation(Mesh &m) {
                 new_face.Indices.push_back(m.Faces[i].Indices[(j + n)%m.Faces[i].Indices.size()]);
             index.push_back(j+1);
             m.Faces.push_back(new_face);
-            //std::cout<<"new   ";
-            for(int k =0; k < new_face.Indices.size(); k ++){
-                std::cout<<' '<<new_face.Indices[k]<<' ';
-            }
-            std::cout<<std::endl;
+            // for(int k =0; k < new_face.Indices.size(); k ++){
+            //     std::cout<<' '<<new_face.Indices[k]<<' ';
+            // }
+            // std::cout<<std::endl;
         }
         int size = m.Faces[i].Indices.size();
-        //std::cout<<" s   "<< m.Faces[i].Indices.size() << ' '<< size/2 <<std::endl;
 
         if(size > 3)
             for(int j = size/2 ; j > 0; j-- )
@@ -341,79 +356,58 @@ void Triangulation(Mesh &m) {
 }
 
 void Correct(Mesh &m, Flat const &f){//перестраивает триангулированный меш в обычный
-//     std::vector<std::vector<Vertex>> vert;
-//     std::vector<Flat> flats;
-//     for(int i =0; i < m.Faces.size(); ++i){
-//         Flat new_f;
-//         std::vector<Vertex> vertexes;
-//         Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}}).normalize();
-//         new_f.n = n;
-//         new_f.p = m.Vertices[m.Faces[i].Indices[0]];
-//         for(int j =0; j < m.Faces[i].Indices.size(); ++j){
-//             vertexes.push_back(m.Vertices[m.Faces[i].Indices[j]])
-//         }
-//         bool dupl = true;
-//         for(int k =0; k < flats.size(); ++k)
-//             if(new_f == flats[k]){
-//                 dupl = false;
-//                 vert[k].push_back(vertexes);
-//             }
-                    
-//         if(dupl)
-//             flats.push_back(new_f);
-//     }
+
+    Flat plane;
+    std::vector<Vertex> vert;
+    Face intersect_face;
 
 
-// }///////////////////////////////////////////////////////////////////////////////////
+    // for(int i =0; i < m.Faces.size(); ++i){
+    //     std::cout<< "doooplaned 3     "<< i <<"   ";
+    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j){
+    //         std::cout<< m.Faces[i].Indices[j] <<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
 
+    // for(int i =0; i<m.Vertices.size(); ++i){
+    //     std::cout<< "verticles in correct  "<< i <<"   "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<' '<<m.Vertices[i].c<<std::endl;
+    // }
 
-
-    // Flat plane;
-
-    for(int i =0; i<m.Vertices.size(); ++i){
-        std::cout<< "vert  "<<i<<"   "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<' '<< m.Vertices[i].c<<std::endl;
+    bool isintersect = false;
+    for(int i =0; i < m.Vertices.size(); ++i){
+        if(m.Vertices[i].c == 0){
+            vert.push_back(m.Vertices[i]);
+        }
     }
 
     for(int i =0; i < m.Faces.size(); ++i){
-        std::cout<< "f  "<< i <<"   ";
         for(int j =0; j < m.Faces[i].Indices.size(); ++j){
-            std::cout<< m.Faces[i].Indices[j] <<' ';
+            if(m.Vertices[m.Faces[i].Indices[j]].c == 0){
+                isintersect = true;
+            }
+            else {
+                isintersect = false;
+                break;
+            }
         }
-        std::cout<<std::endl;
+        if(isintersect){
+            plane.n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}}).normalize();
+            plane.p = m.Vertices[m.Faces[i].Indices[0]];
+            break;
+        }
     }
 
-
-    // std::vector<Vertex> vert;
-    // Face intersect_face;
-
-    // bool isintersect = false;
-    // for(int i =0; i < m.Vertices.size(); ++i){
-    //     if(m.Vertices[i].c == 0){
-    //         vert.push_back(m.Vertices[i]);
-    //     }
-    // }
-    // for(int i =0; i < m.Faces.size(); ++i){
-    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j){
-    //         if(m.Vertices[m.Faces[i].Indices[j]].c == 0){
-    //             isintersect = true;
-    //         }
-    //         else {
-    //             isintersect = false;
-    //             break;
-    //         }
-
-    //     }
-    //     if(isintersect){
-    //         plane.n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}}).normalize();
-    //         plane.p = m.Vertices[m.Faces[i].Indices[0]];
-    //         break;
-    //     }
-    // }
-    // vert = tries(vert, plane);
-    // for(int i = 0; i < vert.size(); ++i){
-    //     intersect_face.Indices.push_back(getVertexIndex(vert[i], m));
-    // }
-
+    if(vert.size() != 0){
+        vert = tries(vert, plane);
+        //std::cout<<"vert size   "<<vert.size()<<std::endl;
+        for(int i = 0; i < vert.size(); ++i){
+            //std::cout<<vert[i]<<' '<<' ';
+            intersect_face.Indices.push_back(getVertexIndex(vert[i], m));
+        }
+    }//std::cout<<"vert size   "<<vert.size()<<std::endl;
+ 
+    
 
 
     Mesh m_new;
@@ -459,21 +453,25 @@ void Correct(Mesh &m, Flat const &f){//перестраивает триангу
     }
 
     for(int i = 0; i < arr.size(); ++i){
-        Face f_new;
-        arr[i] = tries(arr[i], p[i] );
-        for(int j =0; j < arr[i].size(); ++j){
-            f_new.Indices.push_back(getVertexIndex(arr[i][j], m));
+        if(arr[i].size() != 0 ){
+            Face f_new;
+
+            arr[i] = tries(arr[i], p[i] );
+            for(int j =0; j < arr[i].size(); ++j)
+                f_new.Indices.push_back(getVertexIndex(arr[i][j], m));
+            m_new.Faces.push_back(f_new);
         }
-        m_new.Faces.push_back(f_new);
+        
     }
-    //m_new.Faces.push_back(intersect_face);
+    if(intersect_face.Indices.size() >= 3)
+        m_new.Faces.push_back(intersect_face);
 
     m.Faces = m_new.Faces;
 }
 
 bool Check(Mesh const &m){
-    
-    std::cout<< "sizes  "<< m.Vertices.size() <<' '<< m.Faces.size()<<' '<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
+    //std::cout<<"v: "<<m.Vertices.size() <<" f:  "<<m.Faces.size()<<"  res:  "<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
+
     if( m.Vertices.size() - m.Faces.size()/2 == 2)
         return true;
     else
@@ -482,9 +480,19 @@ bool Check(Mesh const &m){
 
 void Intersect(Mesh &m, Flat const &f){
 
+
+    Correct(m, f);
+    // for(int i =0; i < m.Faces.size(); ++i){
+    //     std::cout<< "planed 3     "<< i <<"   ";
+    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j){
+    //         std::cout<< m.Faces[i].Indices[j] <<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+
+
     PointClassify(m, f);
     SpecialCases(m, f);
-    Correct(m, f);
     Mesh res = ResultOfIntersect(m, f);
     Triangulation(res);
     m = res;
