@@ -191,7 +191,7 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f);
 
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f);
 
-void SpecialCases(Mesh &m, Flat const &f);
+bool SpecialCases(Mesh &m, Flat const &f);
 
 Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f);
 

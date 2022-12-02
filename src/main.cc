@@ -112,23 +112,24 @@ int main()
     Flat plane1;
     plane1.p = {{0}, {0}, {0}};
     plane1.n = Vector{{1}, {1}, {1}}.normalize();
-    PointClassify(m, plane1);
     Intersect(m, plane1);
 
 
     Flat plane2;
-    plane2.p = {{0}, {0}, {0}};
-    plane2.n = Vector{{0}, {0}, {1}}.normalize();
+    plane2.p = {{-0.5}, {-0.5}, {-0.5}};
+    plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
     PointClassify(m, plane1);
     Intersect(m, plane2);
 
 
-    // Flat plane3;
-    // plane3.p = {{0}, {0}, {0}};
-    // plane3.n = Vector{{0}, {1}, {0}}.normalize();
+    Flat plane3;
+    plane3.p = {{0}, {0}, {0}};
+    plane3.n = Vector{{0}, {1}, {0}}.normalize();
 
-    // PointClassify(m, plane2);
-    // Intersect(m, plane3);
+    PointClassify(m, plane2);
+    Intersect(m, plane3);
+
+
 
 
 

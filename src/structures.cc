@@ -76,7 +76,7 @@ void DeleteVertex(Mesh &m, Vertex &v){//удаление из массива 1 �
         }
 }
 
-void DeleteFace(Mesh &m, Face &f){  //удаление грани из списка
+void DeleteFace(Mesh &m, Face &f){  //удаление 1 грани из списка
     std::vector<int> index_to_del;
     for(int i = 0; i<m.Faces.size(); i++)
         if (m.Faces[i] == f)
@@ -190,18 +190,22 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
 
 
 
-void SpecialCases(Mesh &m, Flat const &f){//проверка на случаи полного и пустого пересечений
+bool SpecialCases(Mesh &m, Flat const &f){//проверка на случаи полного и пустого пересечений
     int zero = OnPoints(m, f);
     int sum = InPoints(m, f) - OutPoints(m, f);
 
-    if((sum == - (m.Vertices.size() - zero)) ){//случаи, где результат - пустое множество
-        std::cerr << "Empty intersect " << std::endl;
+    if(sum == - (m.Vertices.size() - zero) ){//случаи, где результат - пустое множество
+        std::cout << "Empty intersect " << std::endl;
         //отрисовать пустой экран
+        return false;
     }
     if((sum == (m.Vertices.size() - zero)) ){// случаи, когда результат - исходный объект
-        std::cerr << "the object will not change " << std::endl;
+        std::cout << "the object will not change " << std::endl;
         //отрисовка исходного меша
+        return true;
     }
+    else
+        return false;
 }
 
 
@@ -211,6 +215,14 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     Face new_face;
     std::vector<int> face_del;
     std::vector<Vertex> intersect; //points of intersect
+
+    for(int i =0; i < m.Faces.size(); ++i){
+        std::cout<< "doddd  "<< i <<"   ";
+        for(int j =0; j < m.Faces[i].Indices.size(); ++j){
+            std::cout<< m.Faces[i].Indices[j] <<' ';
+        }
+        std::cout<<std::endl;
+    }
 
 
 
@@ -309,10 +321,20 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
 
     m.Faces.push_back(face_intersect);
 
+    for(int i =0; i < m.Faces.size() - 1; ++i){  /// если несколько дублирующихся граней, то возможны ощ
+        for(int j =i + 1; j < m.Faces.size(); ++j)
+            for(int n =0; n < 3; ++n)
+                if(m.Faces[i].Indices[0] == m.Faces[j].Indices[n] && m.Faces[i].Indices[1] == m.Faces[j].Indices[(n+1)% 3 ] && m.Faces[i].Indices[2] == m.Faces[j].Indices[(n + 2)% 3 ])
+                    m.Faces.erase(m.Faces.begin() + j);
+    }
+
+
     return m;
+
 }
 
 void Triangulation(Mesh &m) {
+
 
     // for(int i =0; i<m.Vertices.size(); ++i){
     //     std::cout<< "dovert  "<< i <<"   "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<std::endl;
@@ -325,6 +347,7 @@ void Triangulation(Mesh &m) {
     //     }
     //     std::cout<<std::endl;
     // }
+
 
     DeleteUncorrectFaces(m);
 
@@ -353,6 +376,8 @@ void Triangulation(Mesh &m) {
 
     
     DeleteUncorrectFaces(m);
+
+
 }
 
 void Correct(Mesh &m, Flat const &f){//перестраивает триангулированный меш в обычный
@@ -360,6 +385,8 @@ void Correct(Mesh &m, Flat const &f){//перестраивает триангу
     Flat plane;
     std::vector<Vertex> vert;
     Face intersect_face;
+
+
 
 
     // for(int i =0; i < m.Faces.size(); ++i){
@@ -407,7 +434,7 @@ void Correct(Mesh &m, Flat const &f){//перестраивает триангу
         }
     }//std::cout<<"vert size   "<<vert.size()<<std::endl;
  
-    
+
 
 
     Mesh m_new;
@@ -467,10 +494,12 @@ void Correct(Mesh &m, Flat const &f){//перестраивает триангу
         m_new.Faces.push_back(intersect_face);
 
     m.Faces = m_new.Faces;
+
+
 }
 
 bool Check(Mesh const &m){
-    //std::cout<<"v: "<<m.Vertices.size() <<" f:  "<<m.Faces.size()<<"  res:  "<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
+    std::cout<<"v: "<<m.Vertices.size() <<" f:  "<<m.Faces.size()<<"  res:  "<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
 
     if( m.Vertices.size() - m.Faces.size()/2 == 2)
         return true;
@@ -482,20 +511,26 @@ void Intersect(Mesh &m, Flat const &f){
 
 
     Correct(m, f);
-    // for(int i =0; i < m.Faces.size(); ++i){
-    //     std::cout<< "planed 3     "<< i <<"   ";
-    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j){
-    //         std::cout<< m.Faces[i].Indices[j] <<' ';
-    //     }
-    //     std::cout<<std::endl;
-    // }
-
 
     PointClassify(m, f);
     SpecialCases(m, f);
+
     Mesh res = ResultOfIntersect(m, f);
+
     Triangulation(res);
     m = res;
+
     Check(m);
+    
+    // else if(InPoints(m, f) - OutPoints(m, f) == - (m.Vertices.size() - OnPoints(m,f))){
+    //     for(int i =0; i < m.Vertices.size(); ++i)
+    //         m.Vertices.erase(m.Vertices.begin());
+    //     for(int i =0; i < m.Faces.size(); ++i)
+    //         m.Faces.erase(m.Faces.begin());
+    // }
+    // else if(InPoints(m, f) - OutPoints(m, f) == (m.Vertices.size() - OnPoints(m,f))){
+    //     return;
+    // }
+
 }
 
