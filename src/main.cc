@@ -113,10 +113,16 @@ int main()
 
     Flat plane;
     plane.p = {{0}, {0}, {0}};
-    plane.n = Vector{{1}, {1}, {1}}.normalize();
-    std::cout << plane.D() << std::endl;
+    plane.n = Vector{{1}, {1}, {2}}.normalize();
+    //std::cout << plane.D() << std::endl;
 
     Intersect(m, plane);
+
+
+    // Flat plane2;
+    // plane2.p = {{0}, {0}, {0}};
+    // plane2.n = Vector{{1}, {0}, {0}}.normalize();
+    // Intersect(m, plane2);
 
 
 
@@ -124,8 +130,14 @@ int main()
     for(int i =0; i < m.Vertices.size(); ++i){
         mdl::Vertex v;
         v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
-        v.Normal = {{0}, {1}, {0}};
+        //v.Normal = {{1}, {1}, {1}};
         ver.push_back(v);
+    }
+    for(int i = 0; i < m.Faces.size(); ++i){
+        Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}}).normalize();
+        for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
+            ver[m.Faces[i].Indices[j]].Normal = {{n.x},{n.y},{n.z}};
+        }
     }
     std::vector<unsigned int> indices;
     for(int i =0; i < m.Faces.size(); ++i){
@@ -133,6 +145,9 @@ int main()
             indices.push_back(m.Faces[i].Indices[j]);
         }
     }
+    bool IsTr = Check(m);
+    std::cout<<"check  "<< IsTr<<std::endl;
+    
     mdl::Mesh new_res = {{ver}, {indices}, true};
     ourModel.meshes[0] = new_res;
 

@@ -119,6 +119,13 @@ struct Flat {
     float D() const { return -n.x * p.x - n.y * p.y - n.z * p.z; }
 };
 
+inline bool operator==(Flat const &f1, Flat const &f2){
+    if(f1.n == f2.n && f1.D() == f2.D())
+        return true;
+    else    
+        return false;
+}
+
 inline std::istream &operator>>(std::istream &is, Face &f) {
     is >> f[0] >> f[1] >> f[2] >> f[3];
     return is;
@@ -178,6 +185,8 @@ void DeleteFace(Mesh &m, Face &f);
 
 void PushIndex(Face &f, int index);
 
+void DeleteUncorrectFaces(Mesh &m);
+
 std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f);
 
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f);
@@ -189,5 +198,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f);
 void Triangulation(Mesh &m);
 
 void Correct(Mesh &m, Flat const &f);
+
+bool Check(Mesh const &m);
 
 void Intersect(Mesh &m, Flat const &f);
