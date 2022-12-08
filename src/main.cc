@@ -122,43 +122,9 @@ int main()
 
     Flat plane1;
 
-    // plane1.p = {{1}, {0}, {0}};
-    // plane1.n = Vector{{-1}, {0.0003}, {0}}.normalize();
-    // Intersect(m, plane1);
 
 
-    // plane1.p = {{1}, {1.0001}, {1}};
-    // plane1.n = Vector{{-1}, {0.5}, {0}}.normalize();
-    // Intersect(m, plane1);
-
-
-
-    // plane1.p = {{1}, {0.9998}, {1}};
-    // plane1.n = Vector{{-1}, {-1}, {-1}}.normalize();
-    // Intersect(m, plane1);
-
-    // plane1.p = {{1}, {0.9998}, {1}};
-    // plane1.n = Vector{{1}, {1}, {1}}.normalize();
-    // Intersect(m, plane1);
-
-
-
-    // plane1.p = {{0.99999}, {0}, {0}};
-    // plane1.n = Vector{{1}, {0}, {0}}.normalize();
-    // Intersect(m, plane1);
-
-    // plane1.p = {{0.99999}, {0}, {0}};
-    // plane1.n = Vector{{-1}, {0}, {0}}.normalize();
-    // Intersect(m, plane1);
-
-
-
-
-    // plane1.p = {{0}, {0}, {0}};
-    // plane1.n = Vector{{1}, {1}, {0}}.normalize();
-    // Intersect(m, plane1);
-
-    plane1.p = {{0}, {0}, {0}};
+    plane1.p = {{0.5}, {0.5}, {1}};
     plane1.n = Vector{{1}, {1}, {1}}.normalize();
     Intersect(m, plane1);
 
@@ -166,9 +132,8 @@ int main()
 
 
     // Flat plane2;
-    // plane2.p = {{-0.5}, {-0.5}, {-0.5}};
-    // plane2.n = Vector{{0}, {1}, {0}}.normalize();
-    // //PointClassify(m, plane1);
+    // plane2.p = {{0}, {0}, {0}};
+    // plane2.n = Vector{{1}, {1}, {0}}.normalize();
     // Intersect(m, plane2);
 
 
@@ -181,7 +146,7 @@ int main()
         v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
         ver.push_back(v);
     }
-    for(int i = 0; i < m.Faces.size(); ++i){
+    for(int i = 0; i < m.Faces.size(); ++i){//пересчитать нормали
         Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}}).normalize();
         for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
             ver[m.Faces[i].Indices[j]].Normal = {{n.x},{n.y},{n.z}};
@@ -196,7 +161,7 @@ int main()
     bool IsTr = Check(m);
     std::cout<<"is correct  "<< IsTr<<std::endl;
     
-    mdl::Mesh new_res = {{ver}, {indices},IsTr};
+    mdl::Mesh new_res = {{ver}, {indices},true};
     ourModel.meshes[0] = new_res;
 
 

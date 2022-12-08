@@ -202,3 +202,7 @@ void Correct(Mesh &m, Flat const &f);
 bool Check(Mesh const &m);
 
 void Intersect(Mesh &m, Flat const &f);
+
+float cos(Vector const &v1, Vector const &v2);
+
+float sin(Vector const &v1, Vector const &v2);
