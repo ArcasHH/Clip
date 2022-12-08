@@ -80,7 +80,7 @@ inline Vector operator-(Vector const &B, Vector const &A) {
 }
 
 inline bool operator==(Vector const &B, Vector const &A) {//с погрешностью в 1%
-    float e = 1e-3;
+    float e = 1e-4;
     return (std::abs(A.x - B.x) < e && std::abs(A.y - B.y) < e && std::abs(A.z - B.z) < e);
 }
 

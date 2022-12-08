@@ -8,54 +8,50 @@ float PointInFlat (Vertex const &p, Flat const &f){//подставление к
 }
 
 void  PointClassify(Mesh &m , Flat const &f){//классификация точек тела относительно плоскости
+    float e = 1e-4;
     for(int i =0; i<m.Vertices.size(); ++i){
-        if( PointInFlat(m.Vertices[i], f) < 0)//IN
+        if( PointInFlat(m.Vertices[i], f) < -e)//IN
             m.Vertices[i].c = 1;
-        else if( -0.0001 < PointInFlat(m.Vertices[i], f) && PointInFlat(m.Vertices[i], f) < 0.0001)//ON
+        else if(PointInFlat(m.Vertices[i], f) < e && PointInFlat(m.Vertices[i], f)  > -e)//ON
             m.Vertices[i].c = 0;
-        else if( PointInFlat(m.Vertices[i], f) > 0)//OUT
+        else if( PointInFlat(m.Vertices[i], f) > e)//OUT
             m.Vertices[i].c = -1;
     }
 }
 
 int InPoints(Mesh const &m , Flat const &f){//Количество точек in
     int in = 0;
-    for(int i =0; i<m.Vertices.size(); ++i){
-        if( PointInFlat(m.Vertices[i], f) < 0){//IN
+    for(int i =0; i<m.Vertices.size(); ++i)
+        if( m.Vertices[i].c == 1)//IN
             in ++;
-        }
-    }
     return in;
 }
 int OnPoints(Mesh const &m , Flat const &f){//Количество точек on 
     int zero = 0;
-    for(int i =0; i<m.Vertices.size(); ++i){
-        if( PointInFlat(m.Vertices[i], f) == 0){//ON
+    for(int i =0; i<m.Vertices.size(); ++i)
+        if(  m.Vertices[i].c == 0)//ON
             zero ++;
-        }
-    }
     return zero;
 }
 int OutPoints(Mesh const &m , Flat const &f){//Количество точек out
     int out = 0;
-    for(int i =0; i<m.Vertices.size(); ++i){
-        if( PointInFlat(m.Vertices[i], f) > 0){//OUT
+    for(int i =0; i<m.Vertices.size(); ++i)
+        if(  m.Vertices[i].c == -1)//OUT
             out ++;
-        }
-    }
     return out;
 }
 
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f){//точка пересечения плоскости и отрезка
     if(PointInFlat(s.A,f) * PointInFlat(s.B,f) < 0) {
         Vertex p = s.A - s.B; 
-        
-        float t = - ( PointInFlat(s.B, f)) / (PointInFlat(p, f) - f.D());
+        if((PointInFlat(p, f) - f.D()) != 0){
+            float t = - ( PointInFlat(s.B, f)) / (PointInFlat(p, f) - f.D());
         //p = (s.A * t) + (s.B * (1.f - t));
         p.x = (s.A.x * t) + (s.B.x * (1.f - t));
         p.y = (s.A.y * t) + (s.B.y * (1.f - t));
         p.z = (s.A.z * t) + (s.B.z * (1.f - t));
         return p;
+        }
     }
     throw std::runtime_error("Here should be intersection!!!");  //PointInFlat(p, f) - f.D() == 0 <=> A == B, но тогда невозможно, что PointInFlat(s.A,f) * PointInFlat(s.B,f) < 0
 }                                                                // эта функция вызывается для пар точек IN и OUT => PointInFlat(s.A,f) * PointInFlat(s.B,f) < 0 всегда выполнено
@@ -194,6 +190,11 @@ bool SpecialCases(Mesh &m, Flat const &f){//проверка на случаи �
     int zero = OnPoints(m, f);
     int sum = InPoints(m, f) - OutPoints(m, f);
 
+    std::cout<<"in:   "<< InPoints(m,f)<<std::endl;
+    std::cout<<"on:   "<< OnPoints(m,f)<<std::endl;
+    std::cout<<"out:   "<< OutPoints(m,f)<<std::endl;
+    std::cout<<"sum:   "<< sum<<std::endl;
+
     if(sum == - (m.Vertices.size() - zero) ){//случаи, где результат - пустое множество
         std::cout << "Empty intersect " << std::endl;
         //отрисовать пустой экран
@@ -216,14 +217,13 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     std::vector<int> face_del;
     std::vector<Vertex> intersect; //points of intersect
 
-    for(int i =0; i < m.Faces.size(); ++i){
-        std::cout<< "doddd  "<< i <<"   ";
-        for(int j =0; j < m.Faces[i].Indices.size(); ++j){
-            std::cout<< m.Faces[i].Indices[j] <<' ';
-        }
-        std::cout<<std::endl;
-    }
-
+    // for(int i =0; i < m.Faces.size(); ++i){
+    //     std::cout<< "doddd  "<< i <<"   ";
+    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j){
+    //         std::cout<< m.Faces[i].Indices[j] <<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
 
 
     // for(int i =0; i<m.Vertices.size(); ++i){
@@ -314,14 +314,18 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     for (int i = 0; i < new_face.Indices.size(); ++i)
         intersect.push_back(m.Vertices[new_face.Indices[i]]);
 
+
+
     intersect = tries(intersect, f);//вектор вершин в нужном порядке для новой грани
+
+
     Face face_intersect;
     for(int i =0; i < intersect.size(); ++i)
         face_intersect.Indices.push_back(getVertexIndex(intersect[i], m));
 
     m.Faces.push_back(face_intersect);
 
-    for(int i =0; i < m.Faces.size() - 1; ++i){  /// если несколько дублирующихся граней, то возможны ощ
+    for(int i =0; i < m.Faces.size() - 1; ++i){  /// если несколько дублирующихся граней, то возможны jo
         for(int j =i + 1; j < m.Faces.size(); ++j)
             for(int n =0; n < 3; ++n)
                 if(m.Faces[i].Indices[0] == m.Faces[j].Indices[n] && m.Faces[i].Indices[1] == m.Faces[j].Indices[(n+1)% 3 ] && m.Faces[i].Indices[2] == m.Faces[j].Indices[(n + 2)% 3 ])
@@ -385,9 +389,6 @@ void Correct(Mesh &m, Flat const &f){//перестраивает триангу
     Flat plane;
     std::vector<Vertex> vert;
     Face intersect_face;
-
-
-
 
     // for(int i =0; i < m.Faces.size(); ++i){
     //     std::cout<< "doooplaned 3     "<< i <<"   ";
@@ -509,9 +510,7 @@ bool Check(Mesh const &m){
 
 void Intersect(Mesh &m, Flat const &f){
 
-
     Correct(m, f);
-
     PointClassify(m, f);
     SpecialCases(m, f);
 
@@ -519,18 +518,7 @@ void Intersect(Mesh &m, Flat const &f){
 
     Triangulation(res);
     m = res;
-
     Check(m);
-    
-    // else if(InPoints(m, f) - OutPoints(m, f) == - (m.Vertices.size() - OnPoints(m,f))){
-    //     for(int i =0; i < m.Vertices.size(); ++i)
-    //         m.Vertices.erase(m.Vertices.begin());
-    //     for(int i =0; i < m.Faces.size(); ++i)
-    //         m.Faces.erase(m.Faces.begin());
-    // }
-    // else if(InPoints(m, f) - OutPoints(m, f) == (m.Vertices.size() - OnPoints(m,f))){
-    //     return;
-    // }
 
 }
 

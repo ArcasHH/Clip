@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "structures.h"
+//#include "tests.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -90,6 +91,12 @@ int main()
 
 
 
+
+
+
+
+
+
     mdl::Mesh mesh = ourModel.meshes[0];//convert mdl::Mesh to Mesh
     Mesh m;
     for(int i = 0; i  <mesh.vertices.size(); ++i){
@@ -101,35 +108,68 @@ int main()
     }
     for(int i = 0; i < mesh.indices.size() ; i +=3 ){
         Face new_face;
-        for(int n = 0; n < 3; ++n){
+        for(int n = 0; n < 3; ++n)
             new_face.Indices.push_back(mesh.indices[i + n]) ;
-        }
-       
         m.Faces.push_back(new_face);
     }
 
 
+
+
+
+
+
+
     Flat plane1;
-    plane1.p = {{0}, {0}, {0}};
-    plane1.n = Vector{{1}, {1}, {1}}.normalize();
+
+    // plane1.p = {{1}, {0}, {0}};
+    // plane1.n = Vector{{-1}, {0.0003}, {0}}.normalize();
+    // Intersect(m, plane1);
+
+
+    plane1.p = {{1}, {1.0001}, {1}};
+    plane1.n = Vector{{-1}, {0.5}, {0}}.normalize();
     Intersect(m, plane1);
 
 
-    Flat plane2;
-    plane2.p = {{-0.5}, {-0.5}, {-0.5}};
-    plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
-    PointClassify(m, plane1);
-    Intersect(m, plane2);
+
+    // plane1.p = {{1}, {0.9998}, {1}};
+    // plane1.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // Intersect(m, plane1);
+
+    // plane1.p = {{1}, {0.9998}, {1}};
+    // plane1.n = Vector{{1}, {1}, {1}}.normalize();
+    // Intersect(m, plane1);
 
 
-    Flat plane3;
-    plane3.p = {{0}, {0}, {0}};
-    plane3.n = Vector{{0}, {1}, {0}}.normalize();
 
-    PointClassify(m, plane2);
-    Intersect(m, plane3);
+    // plane1.p = {{0.99999}, {0}, {0}};
+    // plane1.n = Vector{{1}, {0}, {0}}.normalize();
+    // Intersect(m, plane1);
+
+    // plane1.p = {{0.99999}, {0}, {0}};
+    // plane1.n = Vector{{-1}, {0}, {0}}.normalize();
+    // Intersect(m, plane1);
 
 
+
+
+    // plane1.p = {{0}, {0}, {0}};
+    // plane1.n = Vector{{1}, {1}, {0}}.normalize();
+    // Intersect(m, plane1);
+
+    // plane1.p = {{0}, {0}, {0}};
+    // plane1.n = Vector{{1}, {1}, {1}}.normalize();
+    // Intersect(m, plane1);
+
+
+
+
+    // Flat plane2;
+    // plane2.p = {{-0.5}, {-0.5}, {-0.5}};
+    // plane2.n = Vector{{0}, {1}, {0}}.normalize();
+    // //PointClassify(m, plane1);
+    // Intersect(m, plane2);
 
 
 
@@ -156,7 +196,7 @@ int main()
     bool IsTr = Check(m);
     std::cout<<"is correct  "<< IsTr<<std::endl;
     
-    mdl::Mesh new_res = {{ver}, {indices}, true};
+    mdl::Mesh new_res = {{ver}, {indices},IsTr};
     ourModel.meshes[0] = new_res;
 
 
