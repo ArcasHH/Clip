@@ -153,6 +153,9 @@ void DeleteUncorrectFaces(Mesh &m){
             
 
 std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//упорядочивание вектора вершин в порядке обхода сечения(соотв.f)
+
+    float e = 1e-6;
+
     std::vector<Vertex> tries;
     Vector norm = f.n.normalize();
     //std::vector<int> del;
@@ -172,9 +175,11 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
     for( int i = 1; i < intersect.size(); ++i ){
         c = cos(zero, Vector{geom, intersect[i]});
         Vector Try = zero.cross(Vector{geom, intersect[i]});
-        //std::cout<<"try      "<<Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
-        if(Try.length_sq() != 0){
+        std::cout<<"try      "<<Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
+        
+        if(Try.length_sq() > e){
             Try = Try.normalize();
+            //std::cout<<"try      "<<Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
             if (Try == norm){
                 angle.push_back(c);
                 //std::cout<<"+    "<<c<<std::endl;
@@ -185,6 +190,7 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
             }      
         }
         else{
+            std::cout<<" -1 pushed"<<std::endl;
             angle.push_back( -1 );
         }
         
@@ -242,10 +248,10 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
         
         for(int j =0; j < intersect.size(); ++j){
             c = cos(zero, Vector{geom, intersect[j]});
-            std::cout<<"ci   "<< i<< ' '<< j<<"   c:     "<< c <<' '<< - 2 - c <<"   angle    "<<angle[i]<<std::endl;
+            std::cout<<"ci   "<< i<< ' '<< j<<"   c:     "<< c <<' '<< - 2 - c <<"   angle    "<<angle[i]<<"       bool     "<<c - angle[i]<<std::endl;
             Vector Try = zero.cross(Vector{geom, intersect[j]});
             //std::cout<<"try      "<< Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
-            if(Try.length_sq() != 0){
+            if(Try.length_sq() > e){
                 Try = Try.normalize();
                 if (Try == norm && c == angle[i]){
                     std::cout<<"tries:   "<<"  c:     "<< c <<"   angle    "<<angle[i]<<std::endl;
@@ -257,7 +263,7 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
                 }  
                 std::cout<<std::endl;
             }
-            else if(Try.length_sq() == 0 && c == angle[i]){
+            else if(Try.length_sq() <= e && std::abs(c-angle[i]) < e){
                 std::cout<<"special:   "<<std::endl;
                 tries.push_back(intersect[j]);
             }  
