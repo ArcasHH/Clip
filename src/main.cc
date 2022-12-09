@@ -124,16 +124,55 @@ int main()
 
 
 
-    plane1.p = {{0.5}, {0.5}, {1}};
-    plane1.n = Vector{{1}, {1}, {1}}.normalize();
+    // plane1.p = {{0.5}, {0.5}, {1}};
+    // plane1.n = Vector{{1}, {1}, {1}}.normalize();
+    // Intersect(m, plane1);
+
+
+    plane1.p = {{-0.5}, {-0.5}, {1}};
+    plane1.n = Vector{{-1}, {-1}, {1}}.normalize();
     Intersect(m, plane1);
+    
+    // plane1.p = {{-0.5}, {0.5}, {-1}};
+    // plane1.n = Vector{{-1}, {1}, {-1}}.normalize();
+    // Intersect(m, plane1);
+
+    plane1.p = {{0.5}, {-0.5}, {-1}};
+    plane1.n = Vector{{1}, {-1}, {-1}}.normalize();
+    Intersect(m, plane1);
+
+
+
+    // plane1.p = {{-0.5}, {0.5}, {1}};
+    // plane1.n = Vector{{-1}, {1}, {1}}.normalize();
+    // Intersect(m, plane1);
+
+    // plane1.p = {{0.5}, {-0.5}, {1}};
+    // plane1.n = Vector{{1}, {-1}, {1}}.normalize();
+    // Intersect(m, plane1);
+
+    // plane1.p = {{0.5}, {0.5}, {-1}};
+    // plane1.n = Vector{{1}, {1}, {-1}}.normalize();
+    // Intersect(m, plane1);
+
+
+
+    // plane1.p = {{-0.5}, {-0.5}, {-1}};
+    // plane1.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // Intersect(m, plane1);
+
+
+
+
+
+
 
 
 
 
     // Flat plane2;
     // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{1}, {1}, {0}}.normalize();
+    // plane2.n = Vector{{0}, {0}, {1}}.normalize();
     // Intersect(m, plane2);
 
 

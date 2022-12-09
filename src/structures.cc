@@ -9,9 +9,9 @@
 float cos(Vector const &v1, Vector const &v2){
     return (v1.dot(v2)) / (v1.length() * v2.length());
 }
-float sin(Vector const &v1, Vector const &v2){//модуль
-        return (v1.cross(v2).length()) / (v1.length() * v2.length());
-}
+// float sin(Vector const &v1, Vector const &v2){//модуль
+//         return (v1.cross(v2).length()) / (v1.length() * v2.length());
+// }
 
 float PointInFlat (Vertex const &p, Flat const &f){//подставление координат точки в ур.плоскости
     return f.n.x * p.x + f.n.y * p.y + f.n.z * p.z + f.D();
@@ -159,34 +159,37 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
     Vertex geom = {0, 0, 0};
 
     std::vector<float> angle;//массив - углы между geom,0 и 0, i векторами
+
+
     for(int i=0; i<intersect.size(); ++i){
         geom.x += intersect[i].x / intersect.size();
         geom.y += intersect[i].y / intersect.size();
         geom.z += intersect[i].z / intersect.size();
     }
-    //std::cout<< "geom:      "<<geom.x<<' '<<geom.y<<' '<< geom.z<<std::endl;
+    std::cout<< "geom:      "<<geom.x<<' '<<geom.y<<' '<< geom.z<<std::endl;
     float c;
     Vector zero = Vector{geom, intersect[0]};
     for( int i = 1; i < intersect.size(); ++i ){
-        c = acos(cos(zero, Vector{geom, intersect[i]}));
-        Vector Try = zero.cross(Vector{geom, intersect[i]}).normalize();
+        c = cos(zero, Vector{geom, intersect[i]});
+        Vector Try = zero.cross(Vector{geom, intersect[i]});
         //std::cout<<"try      "<<Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
-        if (Try == norm){
-            angle.push_back(c);
-            //std::cout<<"+    "<<c<<std::endl;
+        if(Try.length_sq() != 0){
+            Try = Try.normalize();
+            if (Try == norm){
+                angle.push_back(c);
+                //std::cout<<"+    "<<c<<std::endl;
+            }
+            else if (Try == -norm){
+                angle.push_back( - 2 - c) ;
+                //std::cout<<"-    "<<c<<std::endl;
+            }      
         }
-        else if (Try == -norm){
-            angle.push_back(c + 3.141592) ;
-            //std::cout<<"-    "<<c<<std::endl;
-        }      
+        else{
+            angle.push_back( -1 );
+        }
+        
 
     }
-
-    std::cout<<"geometry      "<< std::endl;
-    for(int i = 0; i < angle.size(); ++i){
-        std::cout<<' '<<angle[i];
-    }
-    std::cout<<std::endl;
 
 
         // for(int j = i + 1; j < intersect.size(); ++j ){
@@ -210,30 +213,64 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
             // }
         //}
 
+
+
+    std::cout<<"angle:    ";
+    for (int i =0; i < angle.size(); ++i){
+        std::cout<<' '<< angle[i]<<' ';
+    }
+    std::cout<<std::endl;
+
     tries.push_back(intersect[0]);
+    sort(angle.begin(), angle.end());
+    std::vector<float> angle_sorted;
+    for(int i = angle.size()-1; i >=0; i--){
+        angle_sorted.push_back(angle[i]);
+    }
+
+    angle = angle_sorted;
+    std::cout<<"angle_sorted:    ";
+    for (int i =0; i < angle.size(); ++i){
+        std::cout<<' '<< angle[i]<<' ';
+    }
+    std::cout<<std::endl;
+
+
+
 
     for( int i = 0; i < angle.size(); ++i ){
-        //std::cout<<"try      "<<Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
+        
         for(int j =0; j < intersect.size(); ++j){
-            c = acos(cos(zero, Vector{geom, intersect[j]}));
-            std::cout<<"ci   "<< i<< ' '<< j<<"   c:     "<< c <<' '<< c + 3.141592 <<"   angle    "<<angle[i]<<std::endl;
-            Vector Try = zero.cross(Vector{geom, intersect[j]}).normalize();
-            if (Try == norm && c == angle[i]){
-                std::cout<<"tries:   ";
-                tries.push_back(intersect[j]);   
-            }
-            else if (Try == -norm && (c + 3.141592) == angle[i]){
-                    std::cout<<"tries:   ";
-                    std::cout<<"  c:     "<< c + 3.141592<<"   angle    "<<angle[i]<<std::endl;
+            c = cos(zero, Vector{geom, intersect[j]});
+            std::cout<<"ci   "<< i<< ' '<< j<<"   c:     "<< c <<' '<< - 2 - c <<"   angle    "<<angle[i]<<std::endl;
+            Vector Try = zero.cross(Vector{geom, intersect[j]});
+            //std::cout<<"try      "<< Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
+            if(Try.length_sq() != 0){
+                Try = Try.normalize();
+                if (Try == norm && c == angle[i]){
+                    std::cout<<"tries:   "<<"  c:     "<< c <<"   angle    "<<angle[i]<<std::endl;
+                    tries.push_back(intersect[j]);   
+                }
+                else if (Try == -norm && (- 2 - c) == angle[i]){
+                    std::cout<<"tries:   "<<"  c:     "<< - 2 - c <<"   angle    "<<angle[i]<<std::endl;
                 tries.push_back(intersect[j]);
-            }      
+                }  
+                std::cout<<std::endl;
+            }
+            else if(Try.length_sq() == 0 && c == angle[i]){
+                std::cout<<"special:   "<<std::endl;
+                tries.push_back(intersect[j]);
+            }  
         }
         
     }
 
-    for(int i =0; i < tries.size(); ++i){
-        std::cout<<tries[i]<<' ';
-    }
+    // for(int i =0; i < tries.size(); ++i){
+    //     std::cout<<tries[i]<<' ';
+    // }
+
+
+
     // for(int j = 2; j <= intersect.size(); j++){ //tries - список вершин новой грани в порядке обхода. (сортировка)
     //     for(int i=0; i < intersect.size() - 1; ++i)
     //         if(angle[i] == intersect.size() - j)
@@ -277,6 +314,9 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     std::vector<int> face_del;
     std::vector<Vertex> intersect; //points of intersect
 
+
+
+
     for(int i = 0; i < m.Faces.size(); ++i){
         int out = 0;
         for(int j =0; j < m.Faces[i].Indices.size(); ++j){
@@ -307,7 +347,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     }
 
 
-    
+
 
     
     // for(int i = 0; i < face_del.size(); ++i)//удаление граней из меша, все вершины которой OUT(может его удалить? тк эти грани удаляются как пустые)
@@ -366,19 +406,21 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         intersect.push_back(m.Vertices[new_face.Indices[i]]);
 
 
-    // std::cout<<"intersect:   "<<std::endl;
+
+
+    // std::cout<<"intersect before tries:   "<<std::endl;
     // for (int i = 0; i < intersect.size(); ++i)
     //     std::cout<<' '<< intersect[i]<<' ';
     // std::cout<<std::endl;
-
 
     intersect = tries( intersect, f);//вектор вершин в нужном порядке для новой грани
 
-
-    // std::cout<<"intersect:   "<<std::endl;
+    // std::cout<<"intersect after tries:   "<<std::endl;
     // for (int i = 0; i < intersect.size(); ++i)
     //     std::cout<<' '<< intersect[i]<<' ';
     // std::cout<<std::endl;
+
+
 
     Face face_intersect;//новая грань пересечения
     for(int i =0; i < intersect.size(); ++i)
@@ -400,7 +442,6 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     //                 m.Faces.erase(m.Faces.begin() + j);
     // }
 
-
     for(int i =0; i<m.Vertices.size(); ++i){
         std::cout<< "v    "<< i <<"     "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<"   c:    "<<m.Vertices[i].c<<std::endl;
     }
@@ -412,6 +453,8 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         std::cout<<std::endl;
     }
 
+
+
     return m;
 
     
@@ -421,10 +464,6 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
 void Triangulation(Mesh &m) {
 
     DeleteUncorrectFaces(m);
-
-
-
-
 
     int faces = m.Faces.size();
     for(int i = 0; i < faces ; ++i){
@@ -467,6 +506,7 @@ void Triangulation(Mesh &m) {
         }
 
     }
+
 
 
 }
