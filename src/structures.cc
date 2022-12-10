@@ -130,13 +130,47 @@ bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2){
 // }
     
 void DeleteDuplicates(Mesh &m){//удаление дупликатов вершин из меша
+    // for(int i =0; i<m.Vertices.size(); ++i){
+    //     std::cout<< "vdo    "<< i <<"     "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<"   c:    "<<m.Vertices[i].c<<std::endl;
+    // }
     std::vector<int> duplicates;
+    std::vector<int> copy;
     for(int i = 0; i < m.Vertices.size() - 1; ++i)
         for(int j = i + 1; j < m.Vertices.size(); ++j)
             if(m.Vertices[i] == m.Vertices[j])
-                duplicates.push_back(j);              
+                duplicates.push_back(j);   
+
+    for(int i = 0; i < duplicates.size(); ++i) {
+        bool a = true;
+        for(int j =0; j < copy.size(); ++j){
+            if(copy[j] == duplicates[i]){
+                a = false;
+            }
+        }
+        if(a){
+            copy.push_back(duplicates[i]);
+        }
+
+    }
+
+    // std::cout<< "duplicates    ";
+    // for(int i =0; i < duplicates.size(); ++i){
+    //     std::cout<<duplicates[i]<<' ';
+    // }     
+    // std::cout<<std::endl;
+    sort(copy.begin(), copy.end());
+
+    duplicates = copy;
+
+    // std::cout<< "copy    ";
+    // for(int i =0; i < copy.size(); ++i){
+    //     std::cout<<copy[i]<<' ';
+    // }     
+    // std::cout<<std::endl;
+
     for(int i = 0; i < duplicates.size(); ++i)
         DeleteVertex(m, m.Vertices[duplicates[i] - i]);
+
 }
 
 
@@ -169,13 +203,13 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
         geom.y += intersect[i].y / intersect.size();
         geom.z += intersect[i].z / intersect.size();
     }
-    std::cout<< "geom:      "<<geom.x<<' '<<geom.y<<' '<< geom.z<<std::endl;
+    // std::cout<< "geom:      "<<geom.x<<' '<<geom.y<<' '<< geom.z<<std::endl;
     float c;
     Vector zero = Vector{geom, intersect[0]};
     for( int i = 1; i < intersect.size(); ++i ){
         c = cos(zero, Vector{geom, intersect[i]});
         Vector Try = zero.cross(Vector{geom, intersect[i]});
-        std::cout<<"try      "<<Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
+        // std::cout<<"try      "<<Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
         
         if(Try.length_sq() > e){
             Try = Try.normalize();
@@ -190,7 +224,7 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
             }      
         }
         else{
-            std::cout<<" -1 pushed"<<std::endl;
+            // std::cout<<" -1 pushed"<<std::endl;
             angle.push_back( -1 );
         }
         
@@ -221,11 +255,11 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
 
 
 
-    std::cout<<"angle:    ";
-    for (int i =0; i < angle.size(); ++i){
-        std::cout<<' '<< angle[i]<<' ';
-    }
-    std::cout<<std::endl;
+    // std::cout<<"angle:    ";
+    // for (int i =0; i < angle.size(); ++i){
+    //     std::cout<<' '<< angle[i]<<' ';
+    // }
+    // std::cout<<std::endl;
 
     tries.push_back(intersect[0]);
     sort(angle.begin(), angle.end());
@@ -235,11 +269,11 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
     }
 
     angle = angle_sorted;
-    std::cout<<"angle_sorted:    ";
-    for (int i =0; i < angle.size(); ++i){
-        std::cout<<' '<< angle[i]<<' ';
-    }
-    std::cout<<std::endl;
+    // std::cout<<"angle_sorted:    ";
+    // for (int i =0; i < angle.size(); ++i){
+    //     std::cout<<' '<< angle[i]<<' ';
+    // }
+    // std::cout<<std::endl;
 
 
 
@@ -248,23 +282,23 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
         
         for(int j =0; j < intersect.size(); ++j){
             c = cos(zero, Vector{geom, intersect[j]});
-            std::cout<<"ci   "<< i<< ' '<< j<<"   c:     "<< c <<' '<< - 2 - c <<"   angle    "<<angle[i]<<"       bool     "<<c - angle[i]<<std::endl;
+            // std::cout<<"ci   "<< i<< ' '<< j<<"   c:     "<< c <<' '<< - 2 - c <<"   angle    "<<angle[i]<<"       bool     "<<c - angle[i]<<std::endl;
             Vector Try = zero.cross(Vector{geom, intersect[j]});
             //std::cout<<"try      "<< Try.x<<' '<< Try.y<<' '<<Try.z<< std::endl;
             if(Try.length_sq() > e){
                 Try = Try.normalize();
                 if (Try == norm && c == angle[i]){
-                    std::cout<<"tries:   "<<"  c:     "<< c <<"   angle    "<<angle[i]<<std::endl;
+                    // std::cout<<"tries:   "<<"  c:     "<< c <<"   angle    "<<angle[i]<<std::endl;
                     tries.push_back(intersect[j]);   
                 }
                 else if (Try == -norm && (- 2 - c) == angle[i]){
-                    std::cout<<"tries:   "<<"  c:     "<< - 2 - c <<"   angle    "<<angle[i]<<std::endl;
+                    // std::cout<<"tries:   "<<"  c:     "<< - 2 - c <<"   angle    "<<angle[i]<<std::endl;
                 tries.push_back(intersect[j]);
                 }  
-                std::cout<<std::endl;
+                //std::cout<<std::endl;
             }
             else if(Try.length_sq() <= e && std::abs(c-angle[i]) < e){
-                std::cout<<"special:   "<<std::endl;
+                // std::cout<<"special:   "<<std::endl;
                 tries.push_back(intersect[j]);
             }  
         }
@@ -353,8 +387,6 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     }
 
 
-
-
     
     // for(int i = 0; i < face_del.size(); ++i)//удаление граней из меша, все вершины которой OUT(может его удалить? тк эти грани удаляются как пустые)
     //     DeleteFace(m, m.Faces[face_del[i] - i]);
@@ -376,10 +408,10 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         vert.push_back(m.Vertices[i].z);
     }
 
+
     DeleteDuplicates(m);//удаление совпадающих вершин
 
-
-    
+ 
 
     std::vector<int> index_ver_del;//удаление вершин OUT из меша
     for(int i = 0; i < m.Vertices.size(); ++i){
@@ -410,6 +442,8 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
 
     for (int i = 0; i < new_face.Indices.size(); ++i)
         intersect.push_back(m.Vertices[new_face.Indices[i]]);
+
+
 
 
 
@@ -447,17 +481,6 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
     //             if(m.Faces[i].Indices[0] == m.Faces[j].Indices[n] && m.Faces[i].Indices[1] == m.Faces[j].Indices[(n+1)% 3 ] && m.Faces[i].Indices[2] == m.Faces[j].Indices[(n + 2)% 3 ])
     //                 m.Faces.erase(m.Faces.begin() + j);
     // }
-
-    for(int i =0; i<m.Vertices.size(); ++i){
-        std::cout<< "v    "<< i <<"     "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<"   c:    "<<m.Vertices[i].c<<std::endl;
-    }
-    for(int i =0; i < m.Faces.size(); ++i){
-        std::cout<< "f    "<< i <<"     ";
-        for(int j =0; j < m.Faces[i].Indices.size(); ++j){
-            std::cout<< m.Faces[i].Indices[j] <<' ';
-        }
-        std::cout<<std::endl;
-    }
 
 
 
@@ -503,7 +526,20 @@ void Triangulation(Mesh &m) {
     //     }
     // }
 
-    DeleteUncorrectFaces(m);
+
+    for(int i =0; i < m.Faces.size(); ++i){ ///удаление внутри циклв\а
+        for(int j =0; j < m.Faces[i].Indices.size() - 1; ++j){
+            for(int k = j+1; k < m.Faces[i].Indices.size(); ++k){
+                if(m.Faces[i].Indices[j] == m.Faces[i].Indices[k]){
+                    m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + k);
+
+                }
+            }
+        }
+        
+    }
+   DeleteUncorrectFaces(m);
+ 
 
     for(int i = 0; i < m.Faces.size(); ++i){//если остались грани размера больше 3, то вызывается рекурсивно
         if(m.Faces[i].Indices.size() > 3){
@@ -512,7 +548,6 @@ void Triangulation(Mesh &m) {
         }
 
     }
-
 
 
 }
@@ -659,6 +694,17 @@ void Intersect(Mesh &m, Flat const &f){
 
     Check(m);
 
+
+    // for(int i =0; i<m.Vertices.size(); ++i){
+    //     std::cout<< "v    "<< i <<"     "<< m.Vertices[i].x <<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<"   c:    "<<m.Vertices[i].c<<std::endl;
+    // }
+    // for(int i =0; i < m.Faces.size(); ++i){
+    //     std::cout<< "f    "<< i <<"     ";
+    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j){
+    //         std::cout<< m.Faces[i].Indices[j] <<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
 
 
 
