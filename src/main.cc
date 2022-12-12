@@ -12,7 +12,7 @@
 #include <iostream>
 
 #include "structures.h"
-//#include "tests.h"
+#include "tests.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -118,48 +118,19 @@ int main()
 
 
 
+    Cuboctahedron( m );
 
+    // Rhombicuboctahedron2( m );
 
-    Flat plane1;
+    // Rhombicuboctahedron3( m );
 
+    // Pyramid( m );
 
+    // Octahedron(m);
 
-    plane1.p = {{0.5}, {0.5}, {1}};
-    plane1.n = Vector{{1}, {1}, {1}}.normalize();
-    Intersect(m, plane1);
+    // Tetrahedron(m);
 
-
-    plane1.p = {{-0.5}, {-0.5}, {1}};
-    plane1.n = Vector{{-1}, {-1}, {1}}.normalize();
-    Intersect(m, plane1);
-    
-    plane1.p = {{-0.5}, {0.5}, {-1}};
-    plane1.n = Vector{{-1}, {1}, {-1}}.normalize();
-    Intersect(m, plane1);
-
-    plane1.p = {{0.5}, {-0.5}, {-1}};
-    plane1.n = Vector{{1}, {-1}, {-1}}.normalize();
-    Intersect(m, plane1);
-
-
-
-    plane1.p = {{-0.5}, {0.5}, {1}};
-    plane1.n = Vector{{-1}, {1}, {1}}.normalize();
-    Intersect(m, plane1);
-
-    plane1.p = {{0.5}, {-0.5}, {1}};
-    plane1.n = Vector{{1}, {-1}, {1}}.normalize();
-    Intersect(m, plane1);
-
-    plane1.p = {{0.5}, {0.5}, {-1}};
-    plane1.n = Vector{{1}, {1}, {-1}}.normalize();
-    Intersect(m, plane1);
-
-
-
-    plane1.p = {{-0.5}, {-0.5}, {-1}};
-    plane1.n = Vector{{-1}, {-1}, {-1}}.normalize();
-    Intersect(m, plane1);
+   
 
     Flat plane2;
 
@@ -176,7 +147,7 @@ int main()
 
 
     // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{1}, {1}, {2}}.normalize();
+    // plane2.n = Vector{{1}, {1}, {4}}.normalize();
     // Intersect(m, plane2);
 
 
@@ -190,15 +161,24 @@ int main()
 
 
     std::vector<mdl::Vertex> ver; //convert Mesh back to mdl::Mesh
-    for(int i =0; i < m.Vertices.size(); ++i){
-        mdl::Vertex v;
-        v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
-        ver.push_back(v);
-    }
+    std::vector<Vertex> m_ver;
+    // for(int i =0; i < m.Vertices.size(); ++i){
+    //     mdl::Vertex v;
+    //     v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
+    //     ver.push_back(v);
+    // }
     for(int i = 0; i < m.Faces.size(); ++i){//пересчитать нормали
-        Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}}).normalize();
+        Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}});
+        if( n.length_sq() > 0)
+            n = n.normalize();
         for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
-            ver[m.Faces[i].Indices[j]].Normal = {{n.x},{n.y},{n.z}};
+            Vertex v = m.Vertices[m.Faces[i].Indices[j]];
+            mdl::Vertex vert;//mdl
+            vert.Position = {v.x, v.y, v.z};
+            vert.Normal = {n.x, n.y, n.z};
+            m_ver.push_back(v);
+            ver.push_back(vert);
+            m.Faces[i].Indices[j] = m_ver.size() - 1;
         }
     }
     std::vector<unsigned int> indices;
@@ -248,9 +228,13 @@ int main()
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
         // hardcoded light
-        ourShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        ourShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        ourShader.setVec3("objectColor", 1.0f, 1.f, 1.f);
+
+        ourShader.setVec3("lightColor", 1.0f, 0.8f, 0.f);
         ourShader.setVec3("lightDir", 1.f, 1.f, 1.f);
+
+        ourShader.setVec3("lightColor1", 0.0f, 0.4f, 0.8f);
+        ourShader.setVec3("lightDir1", -1.f, -1.f, -1.f);
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
