@@ -140,40 +140,26 @@ int main()
 
 
 
-    // plane2.p = {{1}, {1}, {1}}; // empty
-    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // plane2.p = {{1}, {1}, {0.99999}}; // empty
+    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
     // Intersect(m, plane2);
 
-    plane2.p = {{1}, {1}, {0.998}}; // empty
-    plane2.n = Vector{{0}, {0}, {-1}}.normalize();
+    // plane2.p = {{1}, {1}, {0.99998}}; // not empty
+    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
+    // Intersect(m, plane2);
+
+
+
+    plane2.p = {{1}, {1}, {0.98}};// empty,,,,,,,,,,,,,????????????????????
+    plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
     Intersect(m, plane2);
 
-    // plane2.p = {{0.5}, {0.5}, {0.5}};
-    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // plane2.p = {{0}, {0}, {1}};
+    // plane2.n = Vector{{0}, {0.0001}, {-1}}.normalize();
     // Intersect(m, plane2);
-
-
-
-    // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{1}, {1}, {4}}.normalize();
+    // plane2.p = {{0}, {0}, {1}};
+    // plane2.n = Vector{{0}, {0.0001}, {1}}.normalize();
     // Intersect(m, plane2);
-
-
-    // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{1}, {0}, {0}}.normalize();
-    // Intersect(m, plane2);
-
-    // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{1}, {-1}, {-1}}.normalize();
-    // Intersect(m, plane2);
-
-
-
-
-
-
-
-
 
 
 
@@ -215,7 +201,7 @@ int main()
     bool IsTr = Check(m);
     std::cout<<"is correct  "<< IsTr <<std::endl;
     
-    mdl::Mesh new_res = {{ver}, {indices},IsTr};
+    mdl::Mesh new_res = {{ver}, {indices},true};
     ourModel.meshes[0] = new_res;
 
 

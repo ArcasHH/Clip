@@ -9,11 +9,11 @@
 #include "obj_parser.h"
 
 struct Vector {
-    float x{0.f}, y{0.f}, z{0.f};
+    double x{0.f}, y{0.f}, z{0.f};
     int c;
 
     Vector() = default;
-    Vector(float x, float y, float z) : x{x}, y{y}, z{z} {}
+    Vector(double x, double y, double z) : x{x}, y{y}, z{z} {}
     Vector(Vector const &A, Vector const &B) {
         x = B.x - A.x;
         y = B.y - A.y;
@@ -21,9 +21,9 @@ struct Vector {
     }
     // Vector(Segment const &S) : Vector{S.A, S.B} {}
 
-    float length_sq() const { return x*x + y*y + z*z; }
-    float length() const { return std::sqrt(length_sq()); }
-    Vector normalize() const { float const len = length(); return Vector{x / len, y / len, z / len};   }
+    double length_sq() const { return x*x + y*y + z*z; }
+    double length() const { return std::sqrt(length_sq()); }
+    Vector normalize() const { double const len = length(); return Vector{x / len, y / len, z / len};   }
 
     // -A; -> A.operator-()
     Vector operator-() {
@@ -42,7 +42,7 @@ struct Vector {
         return *this;
     }
 
-    Vector operator*(float t) const {
+    Vector operator*(double t) const {
         Vector tmp;
         tmp.x *= t;
         tmp.y *= t;
@@ -57,7 +57,7 @@ struct Vector {
         r.z = (x * A.y) - (y * A.x);
         return r;
     } //  it is VectorProduct. [this x A]
-    float dot(Vector const &A) const{
+    double dot(Vector const &A) const{
         return x * A.x + y * A.y + z * A.z;
     } //  it is ScalarProduct. this * A
 };
@@ -80,7 +80,7 @@ inline Vector operator-(Vector const &B, Vector const &A) {
 }
 
 inline bool operator==(Vector const &B, Vector const &A) {//с погрешностью в 1%
-    float e = 1e-4;
+    double e = 1e-4;
     return (std::abs(A.x - B.x) < e && std::abs(A.y - B.y) < e && std::abs(A.z - B.z) < e);
 }
 
@@ -116,7 +116,7 @@ inline bool operator==(Face const &f1, Face const &f2){
 struct Flat {
     Vector n;
     Vertex p;
-    float D() const { return -n.x * p.x - n.y * p.y - n.z * p.z; }
+    double D() const { return -n.x * p.x - n.y * p.y - n.z * p.z; }
 };
 
 inline bool operator==(Flat const &f1, Flat const &f2){
@@ -159,7 +159,7 @@ struct Mesh {
     }
 };
 
-float PointInFlat (Vertex const &p, Flat const &f);
+double PointInFlat (Vertex const &p, Flat const &f);
 
 int getVertexIndex(Vertex const &v, Mesh const &m);
 
@@ -189,5 +189,5 @@ bool Check(Mesh const &m);
 
 void Intersect(Mesh &m, Flat const &f);
 
-float cos(Vector const &v1, Vector const &v2);
+double cos(Vector const &v1, Vector const &v2);
 
