@@ -159,12 +159,6 @@ struct Mesh {
     }
 };
 
-Flat getFlat();
-
-float ScalarProduct(Vector &v1, Vector &v2);
-
-Vector VectorProduct(Vector &v1, Vector &v2);
-
 float PointInFlat (Vertex const &p, Flat const &f);
 
 int getVertexIndex(Vertex const &v, Mesh const &m);
@@ -173,17 +167,11 @@ void PointClassify(Mesh &m, Flat const &f);
 
 void DeleteVertex(Mesh &m, Vertex &v);
 
-//bool isOnLine(Vertex &v, Vertex const &v1, Vertex const &v2);
-
-//std::vector<int> DuplicateVertecies(Mesh &m, std::vector<int> arr);
-
 void DeleteDuplicates(Mesh &m);
 
 void DeleteIndexes(Mesh &m, Face &f, int code);
 
 void DeleteFace(Mesh &m, Face &f);
-
-void PushIndex(Face &f, int index);
 
 void DeleteUncorrectFaces(Mesh &m);
 
@@ -196,8 +184,6 @@ bool SpecialCases(Mesh &m, Flat const &f);
 Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f);
 
 void Triangulation(Mesh &m);
-
-void Correct(Mesh &m, Flat const &f);
 
 bool Check(Mesh const &m);
 

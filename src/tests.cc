@@ -162,6 +162,11 @@ void Rhombicuboctahedron3(Mesh &m){
     Intersect(m, plane);
 }
 
+void Rhombicuboctahedron(Mesh &m){
+    Cuboctahedron( m );
+    
+    Rhombicuboctahedron3( m );
+}
 
 void Pyramid(Mesh &m){
     Flat plane;
@@ -216,17 +221,17 @@ void Octahedron(Mesh &m){
 }
 
 void Tetrahedron(Mesh &m){
-     Flat plane;
+    Flat plane;
 
     plane.p = {{0}, {0}, {1}};
 
     plane.n = Vector{{1.144213}, {0}, {1}}.normalize();
     Intersect(m, plane);
 
-    plane.n = Vector{{-1}, {1.144213}, {1}}.normalize();
+    plane.n = Vector{{-1}, {1.744213}, {1}}.normalize();
     Intersect(m, plane);
 
-    plane.n = Vector{{-1}, {-1.144213}, {1}}.normalize();
+    plane.n = Vector{{-1}, {-1.744213}, {1}}.normalize();
     Intersect(m, plane);
 
     plane.p = {{0}, {0}, {0.5}};

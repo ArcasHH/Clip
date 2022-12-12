@@ -118,11 +118,15 @@ int main()
 
 
 
-    Cuboctahedron( m );
+    // Cuboctahedron( m );
+
+    // Rhombicuboctahedron( m );
+    
+
 
     // Rhombicuboctahedron2( m );
-
     // Rhombicuboctahedron3( m );
+
 
     // Pyramid( m );
 
@@ -136,9 +140,13 @@ int main()
 
 
 
-    // plane2.p = {{0.5}, {0.5}, {0.5}};
-    // plane2.n = Vector{{1}, {2}, {4}}.normalize();
+    // plane2.p = {{1}, {1}, {1}}; // empty
+    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
     // Intersect(m, plane2);
+
+    plane2.p = {{1}, {1}, {0.998}}; // empty
+    plane2.n = Vector{{0}, {0}, {-1}}.normalize();
+    Intersect(m, plane2);
 
     // plane2.p = {{0.5}, {0.5}, {0.5}};
     // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
@@ -158,6 +166,23 @@ int main()
     // plane2.p = {{0}, {0}, {0}};
     // plane2.n = Vector{{1}, {-1}, {-1}}.normalize();
     // Intersect(m, plane2);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Check(m);
 
 
     std::vector<mdl::Vertex> ver; //convert Mesh back to mdl::Mesh
@@ -188,9 +213,9 @@ int main()
         }
     }
     bool IsTr = Check(m);
-    std::cout<<"is correct  "<< IsTr<<std::endl;
+    std::cout<<"is correct  "<< IsTr <<std::endl;
     
-    mdl::Mesh new_res = {{ver}, {indices},true};
+    mdl::Mesh new_res = {{ver}, {indices},IsTr};
     ourModel.meshes[0] = new_res;
 
 
@@ -230,10 +255,10 @@ int main()
         // hardcoded light
         ourShader.setVec3("objectColor", 1.0f, 1.f, 1.f);
 
-        ourShader.setVec3("lightColor", 1.0f, 0.8f, 0.f);
+        ourShader.setVec3("lightColor", 0.8f, 0.6f, 0.2f);
         ourShader.setVec3("lightDir", 1.f, 1.f, 1.f);
 
-        ourShader.setVec3("lightColor1", 0.0f, 0.4f, 0.8f);
+        ourShader.setVec3("lightColor1", 0.0f, 0.2f, 0.3f);
         ourShader.setVec3("lightDir1", -1.f, -1.f, -1.f);
 
         // render the loaded model

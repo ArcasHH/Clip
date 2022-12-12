@@ -1,7 +1,10 @@
 #include <iostream>
 #include "structures.h"
 
+
 void Cuboctahedron(Mesh &m);
+
+void Rhombicuboctahedron(Mesh &m);
 void Rhombicuboctahedron2(Mesh &m);
 void Rhombicuboctahedron3(Mesh &m);
 
