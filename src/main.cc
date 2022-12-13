@@ -116,8 +116,8 @@ int main()
 
 
 
-    // Test(m);
 
+    // Test(m);
 
     Icosahedron( m);
     // Cuboctahedron( m );
@@ -140,11 +140,11 @@ int main()
 
 
 
-    // plane2.p = {{0}, {0}, {0.5}}; // dont change
-    // plane2.n = Vector{{1}, {-2}, {2}}.normalize();
-    // Intersect(m, plane2);
+    plane2.p = {{0}, {0}, {0}}; 
+    plane2.n = Vector{{1}, {-2}, {2}}.normalize();
+    Intersect(m, plane2);
 
-    // plane2.p = {{0}, {-0.2}, {1}}; // change
+    // plane2.p = {{0}, {-0.2}, {1}};
     // plane2.n = Vector{{0}, {2}, {1}}.normalize();
     // Intersect(m, plane2);
 
@@ -152,6 +152,13 @@ int main()
 
 
 
+    // plane2.p = {{0}, {1}, {0.9998}}; // not empty
+    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // Intersect(m, plane2);
+
+    // plane2.p = {{0}, {1}, {0.999}}; // not empty
+    // plane2.n = Vector{{-1}, {-1.003}, {-1}}.normalize();
+    // Intersect(m, plane2);
 
 
 
@@ -270,6 +277,7 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
         WireframeMode = !WireframeMode;
 }

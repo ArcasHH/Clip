@@ -20,7 +20,9 @@ void Test(Mesh const &m_in){
     plane2.n = Vector{{0}, {0}, {-1}}.normalize();
     Intersect(m, plane2);
     if(!Check( m ))
-        std::cout<<"OK"<<std::endl;
+        std::cout<<"OK   "<<  Check(m)<<std::endl;
+    else
+        std::cout<<" ne OK"<<std::endl;
     m = m_in;
 
     
@@ -28,7 +30,9 @@ void Test(Mesh const &m_in){
     plane2.p = {{1}, {1}, {0.99993}}; // not empty
     Intersect(m, plane2);
     if(Check( m ))
-        std::cout<<"OK"<<std::endl;
+        std::cout<<"OK   "<<  Check(m)<<std::endl;
+    else
+        std::cout<<" ne OK"<<std::endl;
     m = m_in;
 
 
@@ -36,29 +40,34 @@ void Test(Mesh const &m_in){
     plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
     Intersect(m, plane2);
     if(!Check( m ))
-        std::cout<<"OK"<<std::endl;
+        std::cout<<"OK   "<<  Check(m)<<std::endl;
+    else
+        std::cout<<" ne OK"<<std::endl;
     m = m_in;
 
     plane2.p = {{1}, {1}, {0.9998}};//not empty
     Intersect(m, plane2);
     if(Check( m ))
-        std::cout<<"OK"<<std::endl;
+        std::cout<<"OK   "<<  Check(m)<<std::endl;
+    else
+        std::cout<<" ne OK"<<std::endl;
     m = m_in;
-
-
-
 
     plane2.p = {{0}, {0}, {1}}; // empty
     plane2.n = Vector{{0}, {0.00006}, {-1}}.normalize();
     Intersect(m, plane2);
     if(!Check( m))
-        std::cout<<"OK"<<std::endl;
+        std::cout<<"OK   "<<  Check(m)<<std::endl;
+    else
+        std::cout<<" ne OK"<<std::endl;
     m = m_in;
                                  // not empty
     plane2.n = Vector{{0}, {0.00007}, {-1}}.normalize();
     Intersect(m, plane2);
     if(Check( m))
-        std::cout<<"OK"<<std::endl;
+        std::cout<<"OK   "<<  Check(m)<<std::endl;
+    else
+        std::cout<<" ne OK"<<std::endl;
 
 }
 
@@ -103,9 +112,26 @@ void Icosahedron( Mesh &m){
     Intersect(m, FlatByPoints(v9, v2, v5));
     Intersect(m, FlatByPoints(v7, v2, v11));
 
+ //cut
+
+    v0 ={ -a *1.5 , 0 , b*1.5};
+    v1 ={ a*1.5 , 0 , b*1.5};
+    v2 ={ -a*1.5 , 0 , -b*1.5};
+    v3 ={ a*1.5 , 0 , -b*1.5};
+    v4 ={ 0, b*1.5, a*1.5};
+    v7 ={ 0, -b*1.5, -a*1.5};
+    v8 ={ b*1.5, a*1.5, 0};
+
+    Intersect(m, FlatByPoints(v7, v2, v0));
+    Intersect(m, FlatByPoints(v7, v1, v3));
+    Intersect(m, FlatByPoints(v0, v8, v1));
+
+
 
     // Intersect(m, FlatByPoints(v4, v2, v10));
     // Intersect(m, FlatByPoints(v6, v2, v1));
+
+    // Intersect(m, FlatByPoints(v5, v11, v10));
 
 }
 
@@ -271,8 +297,7 @@ void Rhombicuboctahedron3(Mesh &m){
 }
 
 void Rhombicuboctahedron(Mesh &m){
-    Cuboctahedron( m );
-    
+    Cuboctahedron( m ); 
     Rhombicuboctahedron3( m );
 }
 

@@ -15,7 +15,7 @@ double PointInFlat (Vertex const &p, Flat const &f){//подставление �
 }
 
 void  PointClassify(Mesh &m , Flat const &f){//классификация точек тела относительно плоскости
-    double e = 6e-5;
+    double e = 1e-5;
     for(int i =0; i<m.Vertices.size(); ++i){
         if( PointInFlat(m.Vertices[i], f) < -e)//IN
             m.Vertices[i].c = 1;

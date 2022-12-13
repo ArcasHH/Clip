@@ -5,8 +5,10 @@ in vec3 Normal;
   
 uniform vec3 lightDir; 
 uniform vec3 lightColor;
+
 uniform vec3 lightDir1; 
 uniform vec3 lightColor1;
+
 uniform vec3 objectColor;
 
 void main()
