@@ -15,7 +15,7 @@ double PointInFlat (Vertex const &p, Flat const &f){//подставление �
 }
 
 void  PointClassify(Mesh &m , Flat const &f){//классификация точек тела относительно плоскости
-    double e = 1e-5;
+    double e = 6e-5;
     for(int i =0; i<m.Vertices.size(); ++i){
         if( PointInFlat(m.Vertices[i], f) < -e)//IN
             m.Vertices[i].c = 1;
@@ -67,6 +67,15 @@ int getVertexIndex(Vertex const &v, Mesh const &m){
         if(m.Vertices[i] == v)
             return i;
     return -1;
+}
+
+void DeleteMesh(Mesh &m ){
+    int size = m.Faces.size();
+    for(int i =0; i < size; ++i)
+        m.Faces.erase(m.Faces.begin());
+    size = m.Vertices.size();
+    for(int i =0; i < size; ++i)
+        m.Vertices.erase(m.Vertices.begin());
 }
 
 void DeleteVertex(Mesh &m, Vertex &v){//удаление из массива 1 вершины, совпадающей с v
@@ -138,6 +147,7 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
 
     std::vector<Vertex> tries;
     Vector norm = f.n.normalize();
+    //std::cout<<"Norm    "<<norm.x<<' '<< norm.y<<' '<<norm.z<<std::endl;
     Vertex geom = {0, 0, 0};
 
     // std::cout<<"intersect   ";
@@ -160,7 +170,9 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
         c = cos(zero, Vector{geom, intersect[i]});
         //std::cout<<"cos   "<< i<< " cos:    "<<c<<std::endl;;
         Vector Try = zero.cross(Vector{geom, intersect[i]});
-        if(Try.length_sq() > e){
+        //std::cout<<"Try    "<<Try.x<<' '<< Try.y<<' '<<Try.z<<std::endl;
+        if(Try.length() > e){
+            //std::cout<<"<<<<<<"<<std::endl;
             Try = Try.normalize();
             if (Try == norm)
                 angle.push_back(c);
@@ -195,14 +207,14 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f){//уп
         for(int j =0; j < intersect.size(); ++j){
             c = cos(zero, Vector{geom, intersect[j]});
             Vector Try = zero.cross(Vector{geom, intersect[j]});
-            if(Try.length_sq() > e){
+            if(Try.length() > e){
                 Try = Try.normalize();
-                if (Try == norm && c == angle[i])
+                if (Try == norm && std::abs(c-angle[i]) < e)
                     tries.push_back(intersect[j]);   
-                else if (Try == -norm && (- 2 - c) == angle[i])
+                else if (Try == -norm && std::abs( -2 - c - angle[i]) < e)
                     tries.push_back(intersect[j]);
             }
-            else if(Try.length_sq() <= e && std::abs(c-angle[i]) < e)
+            else if(Try.length() <= e && std::abs(c-angle[i]) < e)
                 tries.push_back(intersect[j]);
         }
     
@@ -214,17 +226,15 @@ bool SpecialCases(Mesh &m, Flat const &f){
     int zero = OnPoints(m, f);
     int sum = InPoints(m, f) - OutPoints(m, f);
 
-    std::cout<<"in:   "<< InPoints(m,f)<<std::endl;
-    std::cout<<"on:   "<< OnPoints(m,f)<<std::endl;
-    std::cout<<"out:   "<< OutPoints(m,f)<<std::endl;
-    std::cout<<"sum:   "<< sum<<std::endl;
+    // std::cout<<"in:   "<< InPoints(m,f)<<std::endl;
+    // std::cout<<"on:   "<< OnPoints(m,f)<<std::endl;
+    // std::cout<<"out:   "<< OutPoints(m,f)<<std::endl;
+    // std::cout<<"sum:   "<< sum<<std::endl;
 
     if(sum == - (m.Vertices.size() - zero) ){//случаи, где результат - пустое множество
         std::cerr << "Empty intersect " << std::endl;
-        int size = m.Faces.size();
-        // for(int i =0; i < size; ++i)
-        //     m.Faces.erase(m.Faces.begin());
-        // return true;
+        DeleteMesh( m );
+        return false;
     }
     if((sum == (m.Vertices.size() - zero)) ){// случаи, когда результат - исходный объект
         std::cout << "the object will not change " << std::endl;
@@ -316,9 +326,12 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f){
         intersect.push_back(m.Vertices[new_face.Indices[i]]);
 
 
-
     intersect = tries( intersect, f);//вектор вершин в нужном порядке для новой грани
-
+    // std::cout<<"intersect";
+    // for(int i =0; i < intersect.size(); ++i){
+    //     std::cout<<intersect[i]<<' ';
+    // }
+    // std::cout<<std::endl;
 
     Face face_intersect;//новая грань пересечения
     for(int i =0; i < intersect.size(); ++i)
@@ -380,7 +393,7 @@ void Triangulation(Mesh &m) {
 
 
 bool Check(Mesh const &m){
-    std::cout<<"v: "<<m.Vertices.size() <<" f:  "<<m.Faces.size()<<"  res:  "<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
+    //std::cout<<"v: "<<m.Vertices.size() <<" f:  "<<m.Faces.size()<<"  res:  "<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
     if( m.Vertices.size() - m.Faces.size()/2 == 2)
         return true;
     else

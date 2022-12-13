@@ -80,7 +80,7 @@ inline Vector operator-(Vector const &B, Vector const &A) {
 }
 
 inline bool operator==(Vector const &B, Vector const &A) {//с погрешностью в 1%
-    double e = 1e-4;
+    double e = 1e-7;
     return (std::abs(A.x - B.x) < e && std::abs(A.y - B.y) < e && std::abs(A.z - B.z) < e);
 }
 
@@ -164,6 +164,8 @@ double PointInFlat (Vertex const &p, Flat const &f);
 int getVertexIndex(Vertex const &v, Mesh const &m);
 
 void PointClassify(Mesh &m, Flat const &f);
+
+void DeleteMesh(Mesh &m );
 
 void DeleteVertex(Mesh &m, Vertex &v);
 

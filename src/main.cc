@@ -116,13 +116,13 @@ int main()
 
 
 
+    // Test(m);
 
 
+    Icosahedron( m);
     // Cuboctahedron( m );
 
     // Rhombicuboctahedron( m );
-    
-
 
     // Rhombicuboctahedron2( m );
     // Rhombicuboctahedron3( m );
@@ -140,25 +140,12 @@ int main()
 
 
 
-    // plane2.p = {{1}, {1}, {0.99999}}; // empty
-    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
+    // plane2.p = {{0}, {0}, {0.5}}; // dont change
+    // plane2.n = Vector{{1}, {-2}, {2}}.normalize();
     // Intersect(m, plane2);
 
-    // plane2.p = {{1}, {1}, {0.99998}}; // not empty
-    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
-    // Intersect(m, plane2);
-
-
-
-    plane2.p = {{1}, {1}, {0.98}};// empty,,,,,,,,,,,,,????????????????????
-    plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
-    Intersect(m, plane2);
-
-    // plane2.p = {{0}, {0}, {1}};
-    // plane2.n = Vector{{0}, {0.0001}, {-1}}.normalize();
-    // Intersect(m, plane2);
-    // plane2.p = {{0}, {0}, {1}};
-    // plane2.n = Vector{{0}, {0.0001}, {1}}.normalize();
+    // plane2.p = {{0}, {-0.2}, {1}}; // change
+    // plane2.n = Vector{{0}, {2}, {1}}.normalize();
     // Intersect(m, plane2);
 
 
@@ -199,6 +186,7 @@ int main()
         }
     }
     bool IsTr = Check(m);
+    std::cout<<"v: "<<m.Vertices.size() <<" f:  "<<m.Faces.size()<<"  res:  "<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
     std::cout<<"is correct  "<< IsTr <<std::endl;
     
     mdl::Mesh new_res = {{ver}, {indices},true};
