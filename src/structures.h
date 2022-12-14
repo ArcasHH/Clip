@@ -79,8 +79,8 @@ inline Vector operator-(Vector const &B, Vector const &A) {
     return v;
 }
 
-inline bool operator==(Vector const &B, Vector const &A) {//с погрешностью в 1%
-    double e = 1e-7;
+inline bool operator==(Vector const &B, Vector const &A) {
+    double e = 1e-8;
     return (std::abs(A.x - B.x) < e && std::abs(A.y - B.y) < e && std::abs(A.z - B.z) < e);
 }
 
@@ -158,12 +158,13 @@ struct Mesh {
         }
     }
 };
+Flat FlatByPoints(Vertex const&v0, Vertex const&v1, Vertex const&v2);
 
 double PointInFlat (Vertex const &p, Flat const &f);
 
 int getVertexIndex(Vertex const &v, Mesh const &m);
 
-void PointClassify(Mesh &m, Flat const &f);
+void PointClassify(Mesh &m, Flat const &f, double precise);
 
 void DeleteMesh(Mesh &m );
 
@@ -177,19 +178,30 @@ void DeleteFace(Mesh &m, Face &f);
 
 void DeleteUncorrectFaces(Mesh &m);
 
-std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f);
+std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double precise);
 
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f);
 
-bool SpecialCases(Mesh &m, Flat const &f);
+bool SpecialCases(Mesh &m);
 
-Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f);
+Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f, double precise);
 
 void Triangulation(Mesh &m);
 
 bool Check(Mesh const &m);
 
-void Intersect(Mesh &m, Flat const &f);
+void Correct(Mesh &m, double precise);
+
+void Intersect(Mesh &m, Flat const &f, double precise);
 
 double cos(Vector const &v1, Vector const &v2);
 
+
+
+void ClassifyObjects(Mesh &m1, Mesh &m2, double precise);
+
+Mesh ResultOfDifference(Mesh &m1, Mesh &m2, double precise);
+
+void bool_difference(Mesh &m1, Mesh &m2, double precise);
+
+void bool_difference(Mesh &m1, Mesh &m2, double precise);

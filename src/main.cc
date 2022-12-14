@@ -13,6 +13,7 @@
 
 #include "structures.h"
 #include "tests.h"
+#include "functions.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -92,11 +93,6 @@ int main()
 
 
 
-
-
-
-
-
     mdl::Mesh mesh = ourModel.meshes[0];//convert mdl::Mesh to Mesh
     Mesh m;
     for(int i = 0; i  <mesh.vertices.size(); ++i){
@@ -116,49 +112,77 @@ int main()
 
 
 
+    // Mesh m2{m};
+    // Vector r = {1,1,1};
+    // //Scalation(m2, 1.5,1.5, 1.5);
+    // Translation(m2,r);
+    
 
-    // Test(m);
+    double precise = 1e-6;
+    // bool_union(m, m2, precise);
 
-    Icosahedron( m);
-    // Cuboctahedron( m );
+    // Test(m, precise);
 
-    // Rhombicuboctahedron( m );
+    Flat plane2;
 
-    // Rhombicuboctahedron2( m );
-    // Rhombicuboctahedron3( m );
+    // plane2.p = {{1}, {1}, {0.999999}}; //not  empty
+    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
+    // Intersect(m, plane2, precise);
+    // plane2.p = {{1}, {1}, {1}}; // empty
+    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
+    // Intersect(m, plane2, precise);
+
+    // plane2.p = {{1}, {1}, {0.99999}};// not empty
+    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // Intersect(m, plane2, precise);
+    // plane2.p = {{1}, {1}, {1}};// empty
+    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // Intersect(m, plane2, precise);
 
 
-    // Pyramid( m );
+    // Icosahedron( m, precise);
+    // Cuboctahedron( m, precise );
 
-    // Octahedron(m);
+    // Rhombicuboctahedron( m, precise );
 
-    // Tetrahedron(m);
+    // Rhombicuboctahedron2( m, precise );
+    // Rhombicuboctahedron3( m, precise );
+
+
+    // Pyramid( m, precise );
+
+    // Octahedron(m, precise);
+
+    // Tetrahedron(m, precise);
 
    
 
-    Flat plane2;
+    // Flat plane2;
 
 
 
     plane2.p = {{0}, {0}, {0}}; 
-    plane2.n = Vector{{1}, {-2}, {2}}.normalize();
-    Intersect(m, plane2);
+    plane2.n = Vector{{1}, {0}, {0}}.normalize();
+    Intersect(m, plane2, precise);
 
-    // plane2.p = {{0}, {-0.2}, {1}};
-    // plane2.n = Vector{{0}, {2}, {1}}.normalize();
-    // Intersect(m, plane2);
+    plane2.p = {{0}, {-0.2}, {1}};
+    plane2.n = Vector{{0}, {2}, {1}}.normalize();
+    Intersect(m, plane2, precise);
 
 
+    // plane2.p = {{0}, {0}, {0}}; 
+    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // Intersect(m, plane2, precise);
 
 
 
     // plane2.p = {{0}, {1}, {0.9998}}; // not empty
     // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
-    // Intersect(m, plane2);
+    // Intersect(m, plane2, precise);
 
     // plane2.p = {{0}, {1}, {0.999}}; // not empty
     // plane2.n = Vector{{-1}, {-1.003}, {-1}}.normalize();
-    // Intersect(m, plane2);
+    // Intersect(m, plane2, precise);
 
 
 
