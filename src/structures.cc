@@ -123,7 +123,6 @@ void DeleteDuplicates(Mesh &m){//удаление дупликатов верш�
         for(int j = i + 1; j < m.Vertices.size(); ++j)
             if(m.Vertices[i] == m.Vertices[j])
                 duplicates.push_back(j);   
-
     for(int i = 0; i < duplicates.size(); ++i) {
         bool a = true;
         for(int j =0; j < copy.size(); ++j)
@@ -132,41 +131,27 @@ void DeleteDuplicates(Mesh &m){//удаление дупликатов верш�
         if(a)
             copy.push_back(duplicates[i]);
     }
-
     sort(copy.begin(), copy.end());
     duplicates = copy;
-
     for(int i = 0; i < duplicates.size(); ++i)
         DeleteVertex(m, m.Vertices[duplicates[i] - i]);
 }
-
 
 void DeleteUncorrectFaces(Mesh &m){
     std::vector<int> index;           //удаление граней, где меньше трех вершин.
     for(int i = 0; i < m.Faces.size() ; ++i)
         if(m.Faces[i].Indices.size() < 3)
             index.push_back(i);
-
     for(int i = 0; i < index.size(); ++i)
         m.Faces.erase(m.Faces.begin() + index[i] - i);
 }
             
-
 std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double precise){//упорядочивание вектора вершин в порядке обхода сечения(соотв.f)
 
     precise = precise * precise;
-
     std::vector<Vertex> tries;
     Vector norm = f.n.normalize();
-    //std::cout<<"Norm    "<<norm.x<<' '<< norm.y<<' '<<norm.z<<std::endl;
     Vertex geom = {0, 0, 0};
-
-    // std::cout<<"intersect   ";
-    // for(int i =0; i < intersect.size(); ++i){
-    //     std::cout<<intersect[i].x<<' '<<intersect[i].y<<' '<< intersect[i].z<<' ';
-    // }
-    // std::cout<<std::endl;
-
     std::vector<double> angle;
 
     for(int i=0; i<intersect.size(); ++i){
@@ -174,16 +159,12 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double
         geom.y += intersect[i].y / intersect.size();
         geom.z += intersect[i].z / intersect.size();
     }
-        //std::cout<< "geom:      "<<geom.x<<' '<<geom.y<<' '<< geom.z<<std::endl;
     double c;
     Vector zero = Vector{geom, intersect[0]};
     for( int i = 1; i < intersect.size(); ++i ){
         c = cos(zero, Vector{geom, intersect[i]});
-        //std::cout<<"cos   "<< i<< " cos:    "<<c<<std::endl;;
         Vector Try = zero.cross(Vector{geom, intersect[i]});
-        //std::cout<<"Try    "<<Try.x<<' '<< Try.y<<' '<<Try.z<<std::endl;
         if(Try.length() > precise){
-            //std::cout<<"<<<<<<"<<std::endl;
             Try = Try.normalize();
             if (Try == norm)
                 angle.push_back(c);
@@ -194,12 +175,6 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double
             angle.push_back( -1 );
     }
 
-    // std::cout<<"angle:    ";
-    // for (int i =0; i < angle.size(); ++i){
-    //     std::cout<<' '<< angle[i]<<' ';
-    // }
-    // std::cout<<std::endl;
-
     tries.push_back(intersect[0]);
     sort(angle.begin(), angle.end());
     std::vector<double> angle_sorted;
@@ -207,12 +182,6 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double
         angle_sorted.push_back(angle[i]);
 
     angle = angle_sorted;
-
-    //     std::cout<<"angle:    ";
-    // for (int i =0; i < angle.size(); ++i){
-    //     std::cout<<' '<< angle[i]<<' ';
-    // }
-    // std::cout<<std::endl;
 
     for( int i = 0; i < angle.size(); ++i )
         for(int j =0; j < intersect.size(); ++j){
@@ -231,10 +200,6 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double
     
     return tries;
 }
-
-
-
-
 
 Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f, double precise){
     Mesh m{m_in};
@@ -268,8 +233,6 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f, double precise){
             DeleteFace(m, m.Faces[i - del]);
             del++;
         }
-
-
    //vector всех вершин до удаления из меша чтобы восстаановить индексы для граней
     std::vector<Vertex> vert;
     for(int i = 0; i < m.Vertices.size(); ++i){
@@ -325,6 +288,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f, double precise){
 //         }
 //         std::cout<<std::endl;
 //     }
+
     return m;
 
 }
@@ -374,60 +338,46 @@ bool Check(Mesh const &m){//проверка н аправильность по�
         return false;
 }
 
+
+
 void Correct(Mesh &m, double precise){
-   for(int i =0; i < m.Vertices.size(); ++i){
-        std::cout<<"i  "<<i<<"     "<<m.Vertices[i].x<<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<"   c:   "<<m.Vertices[i].c<<std::endl;
-    }
-    for(int i =0; i < m.Faces.size(); ++i){
-        for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
-            std::cout<<m.Faces[i].Indices[j]<<' ';
-        }
-        std::cout<<std::endl;
-    }
-std::cout<<std::endl;
-
-
-
+    DeleteUncorrectFaces(m);
+    std::cout<<std::endl;
     std::vector<Vector> normals;
+    Mesh m2{m};
     
     for(int i =0; i < m.Faces.size(); ++i){
         Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}});
         bool uniq = true;
         n = n.normalize();
-        if(normals.size() != 0){
-            
-            for(int j =0; j < normals.size(); ++j){
+        if(normals.size() != 0)
+            for(int j =0; j < normals.size(); ++j)
                 if(normals[j] == n)
-                    uniq = false;
-            }
-        }
-        if(uniq){
+                    uniq = false; 
+        if(uniq)
             normals.push_back(n);
-        }
     }
 
     std::vector<Face> faces;
     for(int i =0; i < normals.size(); ++i){
         Face new_face;
         std::vector<Vertex> vert;
-        //std::cout<<"normals "<<normals[i]<< std::endl;
-        //std::vector<int> face_index;
+
         for(int j =0; j < m.Faces.size(); ++j){
+            //std::cout<<"faces   "<<m.Vertices[m.Faces[j].Indices[0]];
             Vector n = Vector{{m.Vertices[m.Faces[j].Indices[0]]},{m.Vertices[m.Faces[j].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[j].Indices[1]]},{m.Vertices[m.Faces[j].Indices[2]]}});
-            n = n.normalize();
+            if(n.length() >= precise)
+                n = n.normalize();
             //std::cout<<"  n  "<< n <<"   normal   "<<normals[i]<<std::endl;
             if(n == normals[i]){
                 for(int k =0; k < m.Faces[j].Indices.size(); ++k){
                     bool uniq = true;
-                    for(int n =0; n < vert.size(); ++n){
+                    for(int n =0; n < vert.size(); ++n)
                         if(vert[n] == m.Vertices[m.Faces[j].Indices[k]])
                             uniq = false;
-                    }
                     if(uniq)
                         vert.push_back(m.Vertices[m.Faces[j].Indices[k]]);
-                    //std::cout<<"xxxxxxxxxxxxx   "<<j<<"   vert   "<<m.Vertices[m.Faces[j].Indices[j]]<<std::endl;
                 }
-                //face_index.push_back(j);
             }
         }
 
@@ -435,56 +385,35 @@ std::cout<<std::endl;
         f.n = normals[i];
         f.p = {0, 0, 0};
 
-        // std::vector<int> vert_index;
-        // for(int k = 0; k < vert.size()-1; ++k){
-        //     for(int j = i + 1; j < vert.size(); ++j){
-        //         if(vert[k] == vert[j]){
-        //             vert_index.push_back(j);
-        //         }
-        //     }
-        // }
-        // for(int j =0; j < vert_index.size())
-
-        // std::cout<<"intersect";
-        // for(int k =0; k < vert.size(); ++k){
-        //     std::cout<<getVertexIndex(vert[k], m)<<"  "<< vert[k]<<"    "<<std::endl;
-        // }
-        // std::cout<<std::endl;
-
         vert = tries( vert, f, precise);
-
-        std::cout<<"intersect   ";
+    
         int size = vert.size();
         for(int k =0; k < size ; ++k){
-            std::cout<<getVertexIndex(vert[k% vert.size()], m)<<"  "<< vert[k% vert.size()]<<"    "<<std::endl;
             Vector n = Vector{{vert[k % vert.size()]},{vert[(k+1) % vert.size()]}}.cross(Vector{vert[(k+1) % vert.size()],vert[(k+2) % vert.size()]});
             if(n.length_sq() < precise){
+                DeleteVertex(m2, vert[(k+1) % vert.size()]);
                 vert.erase(vert.begin() + (k + 1) % vert.size());
             }
         }
-        std::cout<<std::endl;
 
-
-
-
-
-        for(int j =0; j < vert.size(); ++j){
+        for(int j =0; j < vert.size(); ++j)
             new_face.Indices.push_back(getVertexIndex(vert[j], m));
-        }
         faces.push_back(new_face);
-
     }
 
+    for(int i =0; i < faces.size(); ++i)
+        for(int j = 0; j < faces[i].Indices.size(); ++j)
+            faces[i].Indices[j] = getVertexIndex( m.Vertices[faces[i].Indices[j]] , m2);
+
     m.Faces = faces;
-
-
+    m.Vertices = m2.Vertices;
 }
 
 void Intersect(Mesh &m, Flat const &f, double precise){ //отсечение объекта плоскостью
     PointClassify(m, f, precise);
     if(SpecialCases(m)){
         Mesh res = ResultOfIntersect(m, f, precise);
-        Correct(res, precise);
+        //Correct(res, precise);
         Triangulation(res);
         m = res;
     }

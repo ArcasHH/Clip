@@ -18,31 +18,7 @@ Mesh getModel(char const * objFile)
     std::string line; 
     ///jg
 
-    while(std::getline(in, line)) {
-        std::stringstream ss{line};
-        char c;
-        ss >> c;
-        switch (c)
-        {
-        case 'v':
-        {
-            Vertex v;
-            ss >> v;
-            pos.push_back(v);
-            break;
-        }
-        case 'f':
-        {
-            Face f;
-            ss >> f;
-            faces.push_back(f);
-            break;
-        }
-        default:
-            std::cerr << "unknown character: " << c << std::endl;
-            break;
-        }
-    }
+
 
     return Mesh{pos, faces};
 }

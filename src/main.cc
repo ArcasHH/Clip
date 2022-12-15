@@ -140,19 +140,24 @@ int main()
     // Intersect(m, plane2, precise);
 
 
+
+
+
+
+    // Dodecahedron( m, precise);
+
     // Icosahedron( m, precise);
+
     // Cuboctahedron( m, precise );
 
     // Rhombicuboctahedron( m, precise );
 
+
     // Rhombicuboctahedron2( m, precise );
     // Rhombicuboctahedron3( m, precise );
 
-
     // Pyramid( m, precise );
-
     // Octahedron(m, precise);
-
     // Tetrahedron(m, precise);
 
    
@@ -161,19 +166,20 @@ int main()
 
 
 
-    plane2.p = {{0}, {0}, {0}}; 
-    plane2.n = Vector{{1}, {0}, {0}}.normalize();
-    Intersect(m, plane2, precise);
 
-    plane2.p = {{0}, {-0.2}, {1}};
-    plane2.n = Vector{{0}, {2}, {1}}.normalize();
-    Intersect(m, plane2, precise);
+    // plane2.p = {{0}, {-0.2}, {1}};
+    // plane2.n = Vector{{0}, {2}, {1}}.normalize();
+    // Intersect(m, plane2, precise);
+
+
 
 
     // plane2.p = {{0}, {0}, {0}}; 
-    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // plane2.n = Vector{{1}, {0}, {0}}.normalize();
     // Intersect(m, plane2, precise);
-
+        plane2.p = {{0}, {0}, {0}}; 
+    plane2.n = Vector{{1}, {1}, {1}}.normalize();
+    Intersect(m, plane2, precise);
 
 
     // plane2.p = {{0}, {1}, {0.9998}}; // not empty

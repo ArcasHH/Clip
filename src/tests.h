@@ -5,6 +5,7 @@ Flat FlatByPoints(Vertex const&v1, Vertex const&v2, Vertex const&v3);
 
 void Test(Mesh const &m_in, double precise);
 
+void Dodecahedron( Mesh &m, double precise);
 void Icosahedron( Mesh &m, double precise);
 void Cuboctahedron(Mesh &m, double precise);
 
