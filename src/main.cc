@@ -14,6 +14,7 @@
 #include "structures.h"
 #include "tests.h"
 #include "functions.h"
+#include "obj_parser.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -86,7 +87,7 @@ int main()
     Shader ourShader("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.vs", "C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.fs", WireframeMode);
 
     // INITIAL TRIANGULATED MODEL
-    mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\cube.obj");
+    mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
 
     // ................................................................................................................................................................
 
@@ -177,8 +178,8 @@ int main()
     // plane2.p = {{0}, {0}, {0}}; 
     // plane2.n = Vector{{1}, {0}, {0}}.normalize();
     // Intersect(m, plane2, precise);
-        plane2.p = {{0}, {0}, {0}}; 
-    plane2.n = Vector{{1}, {1}, {1}}.normalize();
+        plane2.p = {{0.5}, {0.5}, {0.5}}; 
+    plane2.n = Vector{{0}, {1}, {0}}.normalize();
     Intersect(m, plane2, precise);
 
 
@@ -202,6 +203,9 @@ int main()
     //     v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
     //     ver.push_back(v);
     // }
+
+    Write(m);//запись в new.obj полученной модели
+
     for(int i = 0; i < m.Faces.size(); ++i){//пересчитать нормали
         Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}});
         if( n.length_sq() > 0)
@@ -289,8 +293,18 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+
+    
+
     return 0;
 }
+
+
+
+
+
+
+
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
