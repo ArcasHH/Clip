@@ -25,7 +25,7 @@ struct Vertex {
     // glm::vec3 Bitangent;
 };
 
-std::ostream &operator<<(std::ostream& os, Vertex const & V) {
+inline std::ostream &operator<<(std::ostream& os, Vertex const & V) {
     os << V.Position.x << ' ' << V.Position.y << ' ' << V.Position.z;
     return os;
 }

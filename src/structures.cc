@@ -1,9 +1,30 @@
 #include "structures.h"
 #include "obj_parser.h"
 
+#include <learnopengl/model.h>
+
 #include <unordered_set>
 #include <cmath>
 #include <algorithm>
+
+Mesh Convert(mdl::Mesh const &mesh){
+    Mesh m;
+    for(int i = 0; i  <mesh.vertices.size(); ++i){
+        Vertex v;
+        v.x = mesh.vertices[i].Position.x;
+        v.y = mesh.vertices[i].Position.y;
+        v.z = mesh.vertices[i].Position.z;
+        m.Vertices.push_back(v);
+    }
+    for(int i = 0; i < mesh.indices.size() ; i +=3 ){
+        Face new_face;
+        for(int n = 0; n < 3; ++n)
+            new_face.Indices.push_back(mesh.indices[i + n]) ;
+        m.Faces.push_back(new_face);
+    }
+    return m;
+}
+
 
 
 double cos(Vector const &v1, Vector const &v2){
@@ -338,77 +359,6 @@ bool Check(Mesh const &m){//проверка н аправильность по�
         return false;
 }
 
-
-
-void Correct(Mesh &m, double precise){
-    DeleteUncorrectFaces(m);
-    std::cout<<std::endl;
-    std::vector<Vector> normals;
-    Mesh m2{m};
-    
-    for(int i =0; i < m.Faces.size(); ++i){
-        Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}});
-        bool uniq = true;
-        n = n.normalize();
-        if(normals.size() != 0)
-            for(int j =0; j < normals.size(); ++j)
-                if(normals[j] == n)
-                    uniq = false; 
-        if(uniq)
-            normals.push_back(n);
-    }
-
-    std::vector<Face> faces;
-    for(int i =0; i < normals.size(); ++i){
-        Face new_face;
-        std::vector<Vertex> vert;
-
-        for(int j =0; j < m.Faces.size(); ++j){
-            //std::cout<<"faces   "<<m.Vertices[m.Faces[j].Indices[0]];
-            Vector n = Vector{{m.Vertices[m.Faces[j].Indices[0]]},{m.Vertices[m.Faces[j].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[j].Indices[1]]},{m.Vertices[m.Faces[j].Indices[2]]}});
-            if(n.length() >= precise)
-                n = n.normalize();
-            //std::cout<<"  n  "<< n <<"   normal   "<<normals[i]<<std::endl;
-            if(n == normals[i]){
-                for(int k =0; k < m.Faces[j].Indices.size(); ++k){
-                    bool uniq = true;
-                    for(int n =0; n < vert.size(); ++n)
-                        if(vert[n] == m.Vertices[m.Faces[j].Indices[k]])
-                            uniq = false;
-                    if(uniq)
-                        vert.push_back(m.Vertices[m.Faces[j].Indices[k]]);
-                }
-            }
-        }
-
-        Flat f;
-        f.n = normals[i];
-        f.p = {0, 0, 0};
-
-        vert = tries( vert, f, precise);
-    
-        int size = vert.size();
-        for(int k =0; k < size ; ++k){
-            Vector n = Vector{{vert[k % vert.size()]},{vert[(k+1) % vert.size()]}}.cross(Vector{vert[(k+1) % vert.size()],vert[(k+2) % vert.size()]});
-            if(n.length_sq() < precise){
-                DeleteVertex(m2, vert[(k+1) % vert.size()]);
-                vert.erase(vert.begin() + (k + 1) % vert.size());
-            }
-        }
-
-        for(int j =0; j < vert.size(); ++j)
-            new_face.Indices.push_back(getVertexIndex(vert[j], m));
-        faces.push_back(new_face);
-    }
-
-    for(int i =0; i < faces.size(); ++i)
-        for(int j = 0; j < faces[i].Indices.size(); ++j)
-            faces[i].Indices[j] = getVertexIndex( m.Vertices[faces[i].Indices[j]] , m2);
-
-    m.Faces = faces;
-    m.Vertices = m2.Vertices;
-}
-
 void Intersect(Mesh &m, Flat const &f, double precise){ //отсечение объекта плоскостью
     PointClassify(m, f, precise);
     if(SpecialCases(m)){
@@ -419,33 +369,104 @@ void Intersect(Mesh &m, Flat const &f, double precise){ //отсечение о�
     }
 }
 
+void Correct(Mesh &m, double precise){
+    // DeleteUncorrectFaces(m);
+    // std::cout<<std::endl;
+    // std::vector<Vector> normals;
+    // Mesh m2{m};
+    
+    // for(int i =0; i < m.Faces.size(); ++i){
+    //     Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}});
+    //     bool uniq = true;
+    //     n = n.normalize();
+    //     if(normals.size() != 0)
+    //         for(int j =0; j < normals.size(); ++j)
+    //             if(normals[j] == n)
+    //                 uniq = false; 
+    //     if(uniq)
+    //         normals.push_back(n);
+    // }
+
+    // std::vector<Face> faces;
+    // for(int i =0; i < normals.size(); ++i){
+    //     Face new_face;
+    //     std::vector<Vertex> vert;
+
+    //     for(int j =0; j < m.Faces.size(); ++j){
+    //         //std::cout<<"faces   "<<m.Vertices[m.Faces[j].Indices[0]];
+    //         Vector n = Vector{{m.Vertices[m.Faces[j].Indices[0]]},{m.Vertices[m.Faces[j].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[j].Indices[1]]},{m.Vertices[m.Faces[j].Indices[2]]}});
+    //         if(n.length() >= precise)
+    //             n = n.normalize();
+    //         //std::cout<<"  n  "<< n <<"   normal   "<<normals[i]<<std::endl;
+    //         if(n == normals[i]){
+    //             for(int k =0; k < m.Faces[j].Indices.size(); ++k){
+    //                 bool uniq = true;
+    //                 for(int n =0; n < vert.size(); ++n)
+    //                     if(vert[n] == m.Vertices[m.Faces[j].Indices[k]])
+    //                         uniq = false;
+    //                 if(uniq)
+    //                     vert.push_back(m.Vertices[m.Faces[j].Indices[k]]);
+    //             }
+    //         }
+    //     }
+
+    //     Flat f;
+    //     f.n = normals[i];
+    //     f.p = {0, 0, 0};
+
+    //     vert = tries( vert, f, precise);
+    
+    //     int size = vert.size();
+    //     for(int k =0; k < size ; ++k){
+    //         Vector n = Vector{{vert[k % vert.size()]},{vert[(k+1) % vert.size()]}}.cross(Vector{vert[(k+1) % vert.size()],vert[(k+2) % vert.size()]});
+    //         if(n.length_sq() < precise){
+    //             DeleteVertex(m2, vert[(k+1) % vert.size()]);
+    //             vert.erase(vert.begin() + (k + 1) % vert.size());
+    //         }
+    //     }
+
+    //     for(int j =0; j < vert.size(); ++j)
+    //         new_face.Indices.push_back(getVertexIndex(vert[j], m));
+    //     faces.push_back(new_face);
+    // }
+
+    // for(int i =0; i < faces.size(); ++i)
+    //     for(int j = 0; j < faces[i].Indices.size(); ++j)
+    //         faces[i].Indices[j] = getVertexIndex( m.Vertices[faces[i].Indices[j]] , m2);
+
+    // m.Faces = faces;
+    // m.Vertices = m2.Vertices;
+}
+
+
+
 void ClassifyObjects(Mesh &m1, Mesh &m2, double precise){//Классификация точек m1 относительно m2
-    for(int i =0; i<m1.Vertices.size(); ++i){
-        int in_points = 0;
-        int on_points = 0;
-        int out_points = 0;
-        for(int j =0; j < m2.Faces.size(); ++j){
-            Flat f = FlatByPoints(m2.Vertices[m2.Faces[j].Indices[0]], m2.Vertices[m2.Faces[j].Indices[2]], m2.Vertices[m2.Faces[j].Indices[1]]);
-            if( PointInFlat(m1.Vertices[i], f) < -precise)//IN
-                in_points += 1;
-            else if(PointInFlat(m1.Vertices[i], f) < precise && PointInFlat(m1.Vertices[i], f)  > -precise){//ON
-                on_points += 1;
-            }
-            else if( PointInFlat(m1.Vertices[i], f) > precise){//OUT
-                out_points += 1;
-            }
-        }
-        std::cout<<"points:   "<<in_points<<' '<<on_points<<' '<<out_points<<std::endl;
-        if(in_points == m2.Faces.size() && out_points == 0){
-            m1.Vertices[i].c = 1;
-        }
-        else if(on_points + in_points == m2.Faces.size() && out_points == 0){
-            m1.Vertices[i].c = 0;
-        }
-        else if(out_points != 0){
-            m1.Vertices[i].c = -1;
-        }
-    }
+    // for(int i =0; i<m1.Vertices.size(); ++i){
+    //     int in_points = 0;
+    //     int on_points = 0;
+    //     int out_points = 0;
+    //     for(int j =0; j < m2.Faces.size(); ++j){
+    //         Flat f = FlatByPoints(m2.Vertices[m2.Faces[j].Indices[0]], m2.Vertices[m2.Faces[j].Indices[2]], m2.Vertices[m2.Faces[j].Indices[1]]);
+    //         if( PointInFlat(m1.Vertices[i], f) < -precise)//IN
+    //             in_points += 1;
+    //         else if(PointInFlat(m1.Vertices[i], f) < precise && PointInFlat(m1.Vertices[i], f)  > -precise){//ON
+    //             on_points += 1;
+    //         }
+    //         else if( PointInFlat(m1.Vertices[i], f) > precise){//OUT
+    //             out_points += 1;
+    //         }
+    //     }
+    //     std::cout<<"points:   "<<in_points<<' '<<on_points<<' '<<out_points<<std::endl;
+    //     if(in_points == m2.Faces.size() && out_points == 0){
+    //         m1.Vertices[i].c = 1;
+    //     }
+    //     else if(on_points + in_points == m2.Faces.size() && out_points == 0){
+    //         m1.Vertices[i].c = 0;
+    //     }
+    //     else if(out_points != 0){
+    //         m1.Vertices[i].c = -1;
+    //     }
+    // }
 }
 
 
@@ -454,42 +475,42 @@ Mesh ResultOfDifference(Mesh &m1, Mesh &m2, double precise){
 }
 
 void bool_union(Mesh &m1, Mesh &m2, double precise){
-    ClassifyObjects(m1, m2, precise);
+    // ClassifyObjects(m1, m2, precise);
 
-    std::cout<< "m1:  "<<std::endl;
-    for(int i=0; i < m1.Vertices.size(); ++i){
-        std::cout<< m1.Vertices[i].x << ' '<<m1.Vertices[i].y << ' '<<m1.Vertices[i].z << "   c:    "<<m1.Vertices[i].c << ' '<<std::endl;
-    }
-    std::cout<< "m2:  "<<std::endl;
-        for(int i=0; i < m2.Vertices.size(); ++i){
-        std::cout<< m2.Vertices[i].x << ' '<<m2.Vertices[i].y << ' '<<m2.Vertices[i].z << "   c:    "<<m2.Vertices[i].c << ' '<<std::endl;
-    }
+    // std::cout<< "m1:  "<<std::endl;
+    // for(int i=0; i < m1.Vertices.size(); ++i){
+    //     std::cout<< m1.Vertices[i].x << ' '<<m1.Vertices[i].y << ' '<<m1.Vertices[i].z << "   c:    "<<m1.Vertices[i].c << ' '<<std::endl;
+    // }
+    // std::cout<< "m2:  "<<std::endl;
+    //     for(int i=0; i < m2.Vertices.size(); ++i){
+    //     std::cout<< m2.Vertices[i].x << ' '<<m2.Vertices[i].y << ' '<<m2.Vertices[i].z << "   c:    "<<m2.Vertices[i].c << ' '<<std::endl;
+    // }
 
-    if(SpecialCases(m1)){
-        Mesh res = ResultOfDifference(m1, m2, precise);
-        Triangulation(res);
-        m1 = res;
-    }
+    // if(SpecialCases(m1)){
+    //     Mesh res = ResultOfDifference(m1, m2, precise);
+    //     Triangulation(res);
+    //     m1 = res;
+    // }
 }
 
 void bool_difference(Mesh &m1, Mesh &m2, double precise){
 
-    ClassifyObjects(m1, m2, precise); //классификация m1 относительно m2
-    ClassifyObjects(m2, m1, precise);//классификация m2 относительно m1
+    // ClassifyObjects(m1, m2, precise); //классификация m1 относительно m2
+    // ClassifyObjects(m2, m1, precise);//классификация m2 относительно m1
 
-    std::cout<< "m1:  "<<std::endl;
-    for(int i=0; i < m1.Vertices.size(); ++i){
-        std::cout<< m1.Vertices[i].x << ' '<<m1.Vertices[i].y << ' '<<m1.Vertices[i].z << "   c:    "<<m1.Vertices[i].c << ' '<<std::endl;
-    }
-    std::cout<< "m2:  "<<std::endl;
-        for(int i=0; i < m2.Vertices.size(); ++i){
-        std::cout<< m2.Vertices[i].x << ' '<<m2.Vertices[i].y << ' '<<m2.Vertices[i].z << "   c:    "<<m2.Vertices[i].c << ' '<<std::endl;
-    }
+    // std::cout<< "m1:  "<<std::endl;
+    // for(int i=0; i < m1.Vertices.size(); ++i){
+    //     std::cout<< m1.Vertices[i].x << ' '<<m1.Vertices[i].y << ' '<<m1.Vertices[i].z << "   c:    "<<m1.Vertices[i].c << ' '<<std::endl;
+    // }
+    // std::cout<< "m2:  "<<std::endl;
+    //     for(int i=0; i < m2.Vertices.size(); ++i){
+    //     std::cout<< m2.Vertices[i].x << ' '<<m2.Vertices[i].y << ' '<<m2.Vertices[i].z << "   c:    "<<m2.Vertices[i].c << ' '<<std::endl;
+    // }
 
-    if(SpecialCases(m1)){
-        Mesh res = ResultOfDifference(m1, m2, precise);
-        Triangulation(res);
-        m1 = res;
-    }
+    // if(SpecialCases(m1)){
+    //     Mesh res = ResultOfDifference(m1, m2, precise);
+    //     Triangulation(res);
+    //     m1 = res;
+    // }
 }
 

@@ -8,6 +8,8 @@
 
 #include "obj_parser.h"
 
+
+
 struct Vector {
     double x{0.f}, y{0.f}, z{0.f};
     int c;
@@ -205,3 +207,6 @@ Mesh ResultOfDifference(Mesh &m1, Mesh &m2, double precise);
 void bool_difference(Mesh &m1, Mesh &m2, double precise);
 
 void bool_difference(Mesh &m1, Mesh &m2, double precise);
+
+namespace mdl { class Mesh; }
+Mesh Convert(mdl::Mesh const &mesh);

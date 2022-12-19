@@ -87,34 +87,33 @@ int main()
     Shader ourShader("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.vs", "C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\shaders\\model.fs", WireframeMode);
 
     // INITIAL TRIANGULATED MODEL
-    mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
+    mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\cube.obj");
+     mdl::Model ourModel2("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
 
-    // ................................................................................................................................................................
+    // ...........................................................................................................s....................................................
 
-
-
-
-    mdl::Mesh mesh = ourModel.meshes[0];//convert mdl::Mesh to Mesh
-    Mesh m;
-    for(int i = 0; i  <mesh.vertices.size(); ++i){
-        Vertex v;
-        v.x = mesh.vertices[i].Position.x;
-        v.y = mesh.vertices[i].Position.y;
-        v.z = mesh.vertices[i].Position.z;
-        m.Vertices.push_back(v);
-    }
-    for(int i = 0; i < mesh.indices.size() ; i +=3 ){
-        Face new_face;
-        for(int n = 0; n < 3; ++n)
-            new_face.Indices.push_back(mesh.indices[i + n]) ;
-        m.Faces.push_back(new_face);
-    }
-
+    Mesh m = Convert(ourModel.meshes[0]);
+    // mdl::Mesh mesh = ourModel.meshes[0];//convert mdl::Mesh to Mesh
+    // Mesh m;
+    // for(int i = 0; i  <mesh.vertices.size(); ++i){
+    //     Vertex v;
+    //     v.x = mesh.vertices[i].Position.x;
+    //     v.y = mesh.vertices[i].Position.y;
+    //     v.z = mesh.vertices[i].Position.z;
+    //     m.Vertices.push_back(v);
+    // }
+    // for(int i = 0; i < mesh.indices.size() ; i +=3 ){
+    //     Face new_face;
+    //     for(int n = 0; n < 3; ++n)
+    //         new_face.Indices.push_back(mesh.indices[i + n]) ;
+    //     m.Faces.push_back(new_face);
+    // }
 
 
+    Mesh m2 = Convert(ourModel2.meshes[0]);
 
-    // Mesh m2{m};
-    // Vector r = {1,1,1};
+
+    // Vector r = {0.5,0.5,0.5};
     // //Scalation(m2, 1.5,1.5, 1.5);
     // Translation(m2,r);
     
@@ -155,10 +154,13 @@ int main()
 
 
     // Rhombicuboctahedron2( m, precise );
+
     // Rhombicuboctahedron3( m, precise );
 
     // Pyramid( m, precise );
+
     // Octahedron(m, precise);
+
     // Tetrahedron(m, precise);
 
    
@@ -168,9 +170,9 @@ int main()
 
 
 
-    // plane2.p = {{0}, {-0.2}, {1}};
-    // plane2.n = Vector{{0}, {2}, {1}}.normalize();
-    // Intersect(m, plane2, precise);
+    plane2.p = {{0}, {0}, {0}};
+    plane2.n = Vector{{0}, {0}, {1}}.normalize();
+    Intersect(m, plane2, precise);
 
 
 
@@ -178,9 +180,9 @@ int main()
     // plane2.p = {{0}, {0}, {0}}; 
     // plane2.n = Vector{{1}, {0}, {0}}.normalize();
     // Intersect(m, plane2, precise);
-        plane2.p = {{0.5}, {0.5}, {0.5}}; 
-    plane2.n = Vector{{0}, {1}, {0}}.normalize();
-    Intersect(m, plane2, precise);
+    //     plane2.p = {{0}, {0}, {0}}; 
+    // plane2.n = Vector{{-1}, {-1}, {1}}.normalize();
+    // Intersect(m, plane2, precise);
 
 
     // plane2.p = {{0}, {1}, {0.9998}}; // not empty
@@ -236,10 +238,6 @@ int main()
 
     // ................................................................................................................................................................
 
-
-
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -271,13 +269,13 @@ int main()
         ourShader.setVec3("objectColor", 1.0f, 1.f, 1.f);
 
         ourShader.setVec3("lightColor", 0.8f, 0.6f, 0.2f);
-        ourShader.setVec3("lightDir", 1.f, 1.f, 1.f);
+        ourShader.setVec3("lightDir", 1.f, 2.f, 3.f);
 
         ourShader.setVec3("lightColor1", 0.0f, 0.2f, 0.3f);
-        ourShader.setVec3("lightDir1", -1.f, -1.f, -1.f);
+        ourShader.setVec3("lightDir1", -1.f, -2.f, -3.f);
 
         // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 model = glm::mat4( 1.0f );
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);

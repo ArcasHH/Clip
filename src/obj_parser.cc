@@ -41,7 +41,7 @@ void Write(Mesh const &m){
     int normal_index = 1;
     for(int i =0; i < m.Faces.size(); ++i){
         Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}}); //normal
-        std::cout<< n <<std::endl;
+        //std::cout<< n <<std::endl;
         for(int j =0; j < normals.size(); ++j){
             if( n.length() > 0){
                 n = n.normalize();

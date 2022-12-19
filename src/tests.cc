@@ -64,6 +64,8 @@ void Test(Mesh const &m_in, double precise){
         std::cout<<" ne OK"<<std::endl;
 
 }
+
+
 void Dodecahedron( Mesh &m, double precise){
     Scalation(m, 2, 2, 2);
     double phi = 1.6180339887;
@@ -353,35 +355,42 @@ void Pyramid(Mesh &m, double precise){
 void Octahedron(Mesh &m, double precise){
     Flat plane;
 
-    plane.p = {{0}, {-1}, {0}};
+    double p = 0.3;
 
-    plane.n = Vector{{1.144213}, {-1}, {0}}.normalize();
+    plane.p = {p, p, p};
+    plane.n = Vector{{1}, {1}, {1}}.normalize();
     Intersect(m, plane, precise);
 
-    plane.n = Vector{{-1.144213}, {-1}, {0}}.normalize();
+    plane.p = {-p, p, p};
+    plane.n = Vector{{-1}, {1}, {1}}.normalize();
     Intersect(m, plane, precise);
 
-    plane.n = Vector{{0}, {-1}, {1.144213}}.normalize();
+    plane.p = {p, -p, p};
+    plane.n = Vector{{1}, {-1}, {1}}.normalize();
     Intersect(m, plane, precise);
 
-    plane.n = Vector{{0}, {-1}, {-1.144213}}.normalize();
+    plane.p = {p, p, -p};
+    plane.n = Vector{{1}, {1}, {-1}}.normalize();
     Intersect(m, plane, precise);
 
-    plane.p = {{0}, {1}, {0}};
-
-    plane.n = Vector{{1.144213}, {1}, {0}}.normalize();
+    plane.p = {-p, -p, p};
+    plane.n = Vector{{-1}, {-1}, {1}}.normalize();
     Intersect(m, plane, precise);
 
-    plane.n = Vector{{-1.144213}, {1}, {0}}.normalize();
+    plane.p = {p, -p, -p};
+    plane.n = Vector{{1}, {-1}, {-1}}.normalize();
     Intersect(m, plane, precise);
 
-    plane.n = Vector{{0}, {1}, {1.144213}}.normalize();
+    plane.p = {-p, p, -p};
+    plane.n = Vector{{-1}, {1}, {-1}}.normalize();
     Intersect(m, plane, precise);
 
-    plane.n = Vector{{0}, {1}, {-1.144213}}.normalize();
+    plane.p = {-p, -p, -p};
+    plane.n = Vector{{-1}, {-1}, {-1}}.normalize();
     Intersect(m, plane, precise);
 
 }
+
 
 void Tetrahedron(Mesh &m, double precise){
     Flat plane;

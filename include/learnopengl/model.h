@@ -16,6 +16,8 @@
 #include <map>
 #include <vector>
 #include <unordered_map>
+#include <cstring>
+
 using namespace std;
 
 namespace mdl{
@@ -39,8 +41,6 @@ public:
         for(unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);
     }
-    
-private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(string const &path)
     {   
@@ -49,7 +49,7 @@ private:
 
 };
 
-glm::vec3 operator/(glm::vec3 const & v, int i) {
+inline glm::vec3 operator/(glm::vec3 const & v, int i) {
     glm::vec3 tmp = v;
     tmp.x /= i;
     tmp.y /= i;
@@ -57,7 +57,7 @@ glm::vec3 operator/(glm::vec3 const & v, int i) {
     return tmp;
 }
 
-Mesh loadOBJ(const char * path) {
+inline Mesh loadOBJ(const char * path) {
 	printf("Loading OBJ file %s...\n", path);
 
 	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
