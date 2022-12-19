@@ -7,7 +7,7 @@
 #include <cmath>
 #include <algorithm>
 
-Mesh Convert(mdl::Mesh const &mesh){
+Mesh Convert(mdl::Mesh const &mesh){//преобразование меша из mdl 
     Mesh m;
     for(int i = 0; i  <mesh.vertices.size(); ++i){
         Vertex v;
@@ -25,18 +25,29 @@ Mesh Convert(mdl::Mesh const &mesh){
     return m;
 }
 
-
-
 double cos(Vector const &v1, Vector const &v2){
     return (v1.dot(v2)) / (v1.length() * v2.length());
 }
+
 Flat FlatByPoints(Vertex const&v0, Vertex const&v1, Vertex const&v2){ // построение плоскости по трем точкам
     Flat f;
     f.p = v0;
     f.n.x = -(v1.y - v0.y) * (v2.z - v0.z) + (v1.z - v0.z) * (v2.y - v0.y);
     f.n.y = -(v2.x - v0.x) * (v1.z - v0.z) + (v2.z - v0.z) * (v1.x - v0.x);
     f.n.z = -(v1.x - v0.x) * (v2.y - v0.y) + (v1.y - v0.y) * (v2.x - v0.x);
+    f.n = f.n.normalize();
     return f;
+}
+
+Vector Normal( Face const &f, Mesh const &m, double precise){ //получение нормали грани(еще можно обобщить)
+    if(f.Indices.size() >= 3){
+        Vector n = Vector{{m.Vertices[f.Indices[0]]},{m.Vertices[f.Indices[1]]}}.cross(Vector{{m.Vertices[f.Indices[1]]},{m.Vertices[f.Indices[2]]}});
+        if( n.length() == 0)
+            n = {0, 0, 1};//случаи, когда грань - отрезок
+        return n.normalize();
+    }
+    else
+        std::cerr<<"invalid input"<<std::endl;
 }
 
 double PointInFlat (Vertex const &p, Flat const &f){//подставление координат точки в ур.плоскости
@@ -81,14 +92,14 @@ bool SpecialCases(Mesh &m){
 }
 
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f){//точка пересечения плоскости и отрезка
-    if(PointInFlat(s.A,f) * PointInFlat(s.B,f) < 0) {
+    if(PointInFlat(s.A, f) * PointInFlat(s.B, f) < 0) {//если точки по разные стороны относительно плоскости
         Vertex p = s.A - s.B; 
         if((PointInFlat(p, f) - f.D()) != 0){
             double t = - ( PointInFlat(s.B, f)) / (PointInFlat(p, f) - f.D());
-        p.x = (s.A.x * t) + (s.B.x * (1.f - t));
-        p.y = (s.A.y * t) + (s.B.y * (1.f - t));
-        p.z = (s.A.z * t) + (s.B.z * (1.f - t));
-        return p;
+            p.x = (s.A.x * t) + (s.B.x * (1.f - t));
+            p.y = (s.A.y * t) + (s.B.y * (1.f - t));
+            p.z = (s.A.z * t) + (s.B.z * (1.f - t));
+            return p;
         }
     }
     throw std::runtime_error("Here should be intersection!!!");  //PointInFlat(p, f) - f.D() == 0 <=> A == B, но тогда невозможно, что PointInFlat(s.A,f) * PointInFlat(s.B,f) < 0
@@ -102,12 +113,14 @@ int getVertexIndex(Vertex const &v, Mesh const &m){
 }
 
 void DeleteMesh(Mesh &m ){
-    int size = m.Faces.size();
-    for(int i =0; i < size; ++i)
-        m.Faces.erase(m.Faces.begin());
-    size = m.Vertices.size();
-    for(int i =0; i < size; ++i)
-        m.Vertices.erase(m.Vertices.begin());
+    m.Faces.clear();
+    m.Vertices.clear();
+    // int size = m.Faces.size();
+    // for(int i =0; i < size; ++i)
+    //     m.Faces.erase(m.Faces.begin());
+    // size = m.Vertices.size();
+    // for(int i =0; i < size; ++i)
+    //     m.Vertices.erase(m.Vertices.begin());
 }
 
 void DeleteVertex(Mesh &m, Vertex &v){//удаление из массива 1 вершины, совпадающей с v
@@ -158,8 +171,8 @@ void DeleteDuplicates(Mesh &m){//удаление дупликатов верш�
         DeleteVertex(m, m.Vertices[duplicates[i] - i]);
 }
 
-void DeleteUncorrectFaces(Mesh &m){
-    std::vector<int> index;           //удаление граней, где меньше трех вершин.
+void DeleteUncorrectFaces(Mesh &m){//удаление граней, где меньше трех вершин.
+    std::vector<int> index;           
     for(int i = 0; i < m.Faces.size() ; ++i)
         if(m.Faces[i].Indices.size() < 3)
             index.push_back(i);
@@ -172,17 +185,19 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double
     precise = precise * precise;
     std::vector<Vertex> tries;
     Vector norm = f.n.normalize();
-    Vertex geom = {0, 0, 0};
-    std::vector<double> angle;
 
-    for(int i=0; i<intersect.size(); ++i){
-        geom.x += intersect[i].x / intersect.size();
-        geom.y += intersect[i].y / intersect.size();
-        geom.z += intersect[i].z / intersect.size();
+    Vertex geom = {0, 0, 0};
+    double size = intersect.size();
+    for(int i=0; i< size; ++i){
+        geom.x += intersect[i].x / size;
+        geom.y += intersect[i].y / size;
+        geom.z += intersect[i].z / size;
     }
+
+    std::vector<double> angle;
     double c;
     Vector zero = Vector{geom, intersect[0]};
-    for( int i = 1; i < intersect.size(); ++i ){
+    for( int i = 1; i < intersect.size(); ++i ){//заполнение angle значениями, определяющих положение относительно [0]
         c = cos(zero, Vector{geom, intersect[i]});
         Vector Try = zero.cross(Vector{geom, intersect[i]});
         if(Try.length() > precise){
@@ -197,14 +212,14 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double
     }
 
     tries.push_back(intersect[0]);
-    sort(angle.begin(), angle.end());
-    std::vector<double> angle_sorted;
-    for(int i = angle.size()-1; i >=0; i--)
-        angle_sorted.push_back(angle[i]);
 
+    sort(angle.begin(), angle.end());//сортировка по углу относительно geom[0]
+    std::vector<double> angle_sorted;
+    for(int i = angle.size()-1; i >=0; i--)//в обратном порядке
+        angle_sorted.push_back(angle[i]);
     angle = angle_sorted;
 
-    for( int i = 0; i < angle.size(); ++i )
+    for( int i = 0; i < angle.size(); ++i ) //заполнение tries в соответствие с вектором angle (в порядке обхода грани)
         for(int j =0; j < intersect.size(); ++j){
             c = cos(zero, Vector{geom, intersect[j]});
             Vector Try = zero.cross(Vector{geom, intersect[j]});
@@ -218,7 +233,6 @@ std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double
             else if(Try.length() <= precise && std::abs(c-angle[i]) < precise)
                 tries.push_back(intersect[j]);
         }
-    
     return tries;
 }
 
@@ -230,10 +244,8 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f, double precise){
     std::vector<Vertex> intersect; //points of intersect
 
     for(int i = 0; i < m.Faces.size(); ++i){
-        //int out = 0;
         for(int j =0; j < m.Faces[i].Indices.size(); ++j){//для каждой грани обходим все индексы
-            // if(m.Vertices[m.Faces[i].Indices[j]].c == -1)//считаем количество вершин out для каждой грани
-            //     out++;
+
             if( m.Vertices[m.Faces[i].Indices[j]].c  && m.Vertices[m.Faces[i].Indices[j]].c == -m.Vertices[m.Faces[i].Indices[(j+1) % m.Faces[i].Indices.size()]].c ){ //if adjacent vertices with different codes
                 Segment s;                      //если вершина j не ON, и следующая за j(IN) - OUT или наоборот, то строим пересечение ребра и плоскости
                 s.A = m.Vertices[m.Faces[i].Indices[j]];
@@ -248,12 +260,8 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f, double precise){
         DeleteIndexes(m, m.Faces[i], -1);//удаление из граней индексов, соответствующим вершинам OUT
     }
 
-    int del = 0;
-    for(int i = 0; i < m.Faces.size(); ++i)//удаление граней из меша, которые содержат 0 вершин(поидее таких не должно возникать)
-        if(m.Faces[i].Indices.size() == 0){
-            DeleteFace(m, m.Faces[i - del]);
-            del++;
-        }
+    DeleteUncorrectFaces(m);
+
    //vector всех вершин до удаления из меша чтобы восстаановить индексы для граней
     std::vector<Vertex> vert;
     for(int i = 0; i < m.Vertices.size(); ++i){
@@ -276,8 +284,7 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f, double precise){
         for(int n =0; n < m.Faces[j].Indices.size(); ++n)
             for(int i = 0; i < vert.size(); i ++)
                 if(m.Faces[j].Indices[n] == i){
-                    Vertex v = vert[i];
-                    m.Faces[j].Indices[n] = getVertexIndex(v, m);
+                    m.Faces[j].Indices[n] = getVertexIndex(vert[i], m);
                     break;
                 }
 
@@ -288,31 +295,18 @@ Mesh ResultOfIntersect( Mesh const &m_in, Flat const &f, double precise){
     for (int i = 0; i < new_face.Indices.size(); ++i)
         intersect.push_back(m.Vertices[new_face.Indices[i]]);
 
-
     intersect = tries( intersect, f, precise);//вектор вершин intersect в нужном порядке для новой грани
-    // std::cout<<"intersect";
-    // for(int i =0; i < intersect.size(); ++i){
-    //     std::cout<<intersect[i]<<' ';
-    // }
-    // std::cout<<std::endl;
 
-    Face face_intersect;//новая грань пересечения/ заполнение индексами из intersect
+    Face face_intersect;//новая грань пересечения/ заполнение индексами вершин intersect
     for(int i =0; i < intersect.size(); ++i)
         face_intersect.Indices.push_back(getVertexIndex(intersect[i], m));
+
     m.Faces.push_back(face_intersect);
-//    for(int i =0; i < m.Vertices.size(); ++i){
-//         std::cout<<"i  "<<i<<"     "<<m.Vertices[i].x<<' '<< m.Vertices[i].y<<' '<< m.Vertices[i].z<<"   c:   "<<m.Vertices[i].c<<std::endl;
-//     }
-//     for(int i =0; i < m.Faces.size(); ++i){
-//         for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
-//             std::cout<<m.Faces[i].Indices[j]<<' ';
-//         }
-//         std::cout<<std::endl;
-//     }
 
     return m;
 
 }
+
 
 void Triangulation(Mesh &m) { //переделай на триангуляцию каждой грани
 
@@ -341,22 +335,16 @@ void Triangulation(Mesh &m) { //переделай на триангуляцию
                 if(m.Faces[i].Indices[j] == m.Faces[i].Indices[k])
                     m.Faces[i].Indices.erase(m.Faces[i].Indices.begin() + k);      
     }
-   DeleteUncorrectFaces(m);
- 
+    DeleteUncorrectFaces(m);
     for(int i = 0; i < m.Faces.size(); ++i)//если остались грани размера больше 3, то вызывается рекурсивно
         if(m.Faces[i].Indices.size() > 3){
             Triangulation(m);
             break;
         }
-
 }
 
 bool Check(Mesh const &m){//проверка н аправильность построения формулой Эйлера
-    //std::cout<<"v: "<<m.Vertices.size() <<" f:  "<<m.Faces.size()<<"  res:  "<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
-    if( m.Vertices.size() - m.Faces.size()/2 == 2)
-        return true;
-    else
-        return false;
+        return (m.Vertices.size() - m.Faces.size()/2 == 2);
 }
 
 void Intersect(Mesh &m, Flat const &f, double precise){ //отсечение объекта плоскостью

@@ -144,7 +144,7 @@ int main()
 
 
 
-    // Dodecahedron( m, precise);
+    Dodecahedron( m, precise);
 
     // Icosahedron( m, precise);
 
@@ -170,9 +170,9 @@ int main()
 
 
 
-    plane2.p = {{0}, {0}, {0}};
-    plane2.n = Vector{{0}, {0}, {1}}.normalize();
-    Intersect(m, plane2, precise);
+    // plane2.p = {{0}, {0}, {0}};
+    // plane2.n = Vector{{0}, {0}, {1}}.normalize();
+    // Intersect(m, plane2, precise);
 
 
 
@@ -209,9 +209,7 @@ int main()
     Write(m);//запись в new.obj полученной модели
 
     for(int i = 0; i < m.Faces.size(); ++i){//пересчитать нормали
-        Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}});
-        if( n.length_sq() > 0)
-            n = n.normalize();
+        Vector n = Normal( m.Faces[i], m, precise);
         for(int j = 0; j < m.Faces[i].Indices.size(); ++j){
             Vertex v = m.Vertices[m.Faces[i].Indices[j]];
             mdl::Vertex vert;//mdl
@@ -229,7 +227,7 @@ int main()
         }
     }
     bool IsTr = Check(m);
-    std::cout<<"v: "<<m.Vertices.size() <<" f:  "<<m.Faces.size()<<"  res:  "<< m.Vertices.size() - m.Faces.size()/2<<std::endl;
+    std::cout<<"v: "<<m.Vertices.size() <<"   f: "<<m.Faces.size()<<std::endl;
     std::cout<<"is correct  "<< IsTr <<std::endl;
     
     mdl::Mesh new_res = {{ver}, {indices},true};

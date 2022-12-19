@@ -115,6 +115,7 @@ inline bool operator==(Face const &f1, Face const &f2){
     return false;
 }
 
+
 struct Flat {
     Vector n;
     Vertex p;
@@ -161,6 +162,8 @@ struct Mesh {
     }
 };
 Flat FlatByPoints(Vertex const&v0, Vertex const&v1, Vertex const&v2);
+
+Vector Normal( Face const &f, Mesh const &m, double precise);
 
 double PointInFlat (Vertex const &p, Flat const &f);
 
