@@ -88,29 +88,13 @@ int main()
 
     // INITIAL TRIANGULATED MODEL
     mdl::Model ourModel("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\cube.obj");
-     mdl::Model ourModel2("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
+    //mdl::Model ourModel2("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
 
     // ...........................................................................................................s....................................................
 
     Mesh m = Convert(ourModel.meshes[0]);
-    // mdl::Mesh mesh = ourModel.meshes[0];//convert mdl::Mesh to Mesh
-    // Mesh m;
-    // for(int i = 0; i  <mesh.vertices.size(); ++i){
-    //     Vertex v;
-    //     v.x = mesh.vertices[i].Position.x;
-    //     v.y = mesh.vertices[i].Position.y;
-    //     v.z = mesh.vertices[i].Position.z;
-    //     m.Vertices.push_back(v);
-    // }
-    // for(int i = 0; i < mesh.indices.size() ; i +=3 ){
-    //     Face new_face;
-    //     for(int n = 0; n < 3; ++n)
-    //         new_face.Indices.push_back(mesh.indices[i + n]) ;
-    //     m.Faces.push_back(new_face);
-    // }
 
-
-    Mesh m2 = Convert(ourModel2.meshes[0]);
+    //Mesh m2 = Convert(ourModel2.meshes[0]);
 
 
     // Vector r = {0.5,0.5,0.5};
@@ -119,36 +103,44 @@ int main()
     
 
     double precise = 1e-6;
-    // bool_union(m, m2, precise);
+ 
 
-    // Test(m, precise);
+
+
+
+    Test(m, precise);
 
     Flat plane2;
 
-    // plane2.p = {{1}, {1}, {0.999999}}; //not  empty
-    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
-    // Intersect(m, plane2, precise);
-    // plane2.p = {{1}, {1}, {1}}; // empty
-    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
-    // Intersect(m, plane2, precise);
-
-    // plane2.p = {{1}, {1}, {0.99999}};// not empty
-    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
-    // Intersect(m, plane2, precise);
-    // plane2.p = {{1}, {1}, {1}};// empty
-    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
-    // Intersect(m, plane2, precise);
 
 
 
 
-
-
-    Dodecahedron( m, precise);
+    // Dodecahedron( m, precise);
 
     // Icosahedron( m, precise);
 
-    // Cuboctahedron( m, precise );
+    Cuboctahedron( m, precise );
+
+    plane2.p = {{0}, {0}, {1 - precise*0.9}};//not change
+    plane2.n = Vector{{0}, {0}, {1}}.normalize();
+    Intersect(m, plane2, precise);
+
+    plane2.p = {{0}, {1}, {1 - precise}};//not change
+    plane2.n = Vector{{1}, {1}, {1}}.normalize();
+    Intersect(m, plane2, precise);
+
+        plane2.p = {{0}, {0}, {1 - precise}};//not change
+    plane2.n = Vector{{0}, {0}, {1}}.normalize();
+    Intersect(m, plane2, precise);
+
+    plane2.p = {{0}, {1}, {1 - precise}};//not change
+    plane2.n = Vector{{1}, {1}, {1}}.normalize();
+    Intersect(m, plane2, precise);
+
+
+
+
 
     // Rhombicuboctahedron( m, precise );
 
@@ -206,7 +198,7 @@ int main()
     //     ver.push_back(v);
     // }
 
-    Write(m);//запись в new.obj полученной модели
+    Write(m, precise);//запись в new.obj полученной модели
 
     for(int i = 0; i < m.Faces.size(); ++i){//пересчитать нормали
         Vector n = Normal( m.Faces[i], m, precise);

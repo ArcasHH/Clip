@@ -82,8 +82,8 @@ inline Vector operator-(Vector const &B, Vector const &A) {
 }
 
 inline bool operator==(Vector const &B, Vector const &A) {
-    double e = 1e-8;
-    return (std::abs(A.x - B.x) < e && std::abs(A.y - B.y) < e && std::abs(A.z - B.z) < e);
+    double precise = 1e-5;
+    return (std::abs(A.x - B.x) < precise && std::abs(A.y - B.y) < precise && std::abs(A.z - B.z) < precise);
 }
 
 struct Segment {

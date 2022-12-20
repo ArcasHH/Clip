@@ -4,4 +4,4 @@ class Mesh;
 
 Mesh getModel(char const * objFile);
 
-void Write(Mesh const &m);
+void Write(Mesh const &m, double precise);

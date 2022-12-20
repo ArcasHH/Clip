@@ -6,7 +6,7 @@
 
 #include "structures.h"
 
-void Write(Mesh const &m){
+void Write(Mesh const &m, double precise){
     std::ofstream fout("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
     //fout.open("cppstudio.txt");
     fout << "# Blender3D v249 OBJ File: untitled.blend" <<std::endl;
@@ -23,7 +23,7 @@ void Write(Mesh const &m){
     for(int i =0; i < m.Faces.size(); ++i){
         Vector n = Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}});
         bool uniq = true;
-        if(n.length() > 0){
+        if(n.length() > precise){
             n = n.normalize();
             if(normals.size() != 0)
                 for(int j =0; j < normals.size(); ++j)

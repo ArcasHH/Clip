@@ -10,7 +10,9 @@ void Test(Mesh const &m_in, double precise){
 
     Flat plane2;
 
-    plane2.p = {{1}, {1}, {0.99994}}; // empty
+    double test = precise;
+
+    plane2.p = {{1}, {1}, {1 - test * 0.9}}; // empty
     plane2.n = Vector{{0}, {0}, {-1}}.normalize();
     Intersect(m, plane2, precise);
     if(!Check( m ))
@@ -19,9 +21,7 @@ void Test(Mesh const &m_in, double precise){
         std::cout<<" ne OK"<<std::endl;
     m = m_in;
 
-    
-
-    plane2.p = {{1}, {1}, {0.99993}}; // not empty
+    plane2.p = {{1}, {1}, {1 - 2 * test}}; // not empty
     Intersect(m, plane2, precise);
     if(Check( m ))
         std::cout<<"OK   "<<  Check(m)<<std::endl;
@@ -30,7 +30,7 @@ void Test(Mesh const &m_in, double precise){
     m = m_in;
 
 
-    plane2.p = {{1}, {1}, {0.9999}};// empty
+    plane2.p = {{1}, {1}, {1 - test}};// empty
     plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
     Intersect(m, plane2, precise);
     if(!Check( m ))
@@ -39,7 +39,7 @@ void Test(Mesh const &m_in, double precise){
         std::cout<<" ne OK"<<std::endl;
     m = m_in;
 
-    plane2.p = {{1}, {1}, {0.9998}};//not empty
+    plane2.p = {{1}, {1}, {1 - 4  * test}};//not empty
     Intersect(m, plane2, precise);
     if(Check( m ))
         std::cout<<"OK   "<<  Check(m)<<std::endl;
@@ -48,7 +48,7 @@ void Test(Mesh const &m_in, double precise){
     m = m_in;
 
     plane2.p = {{0}, {0}, {1}}; // empty
-    plane2.n = Vector{{0}, {0.00006}, {-1}}.normalize();
+    plane2.n = Vector{{0}, {test}, {-1}}.normalize();
     Intersect(m, plane2, precise);
     if(!Check( m))
         std::cout<<"OK   "<<  Check(m)<<std::endl;
@@ -56,7 +56,7 @@ void Test(Mesh const &m_in, double precise){
         std::cout<<" ne OK"<<std::endl;
     m = m_in;
                                  // not empty
-    plane2.n = Vector{{0}, {0.00007}, {-1}}.normalize();
+    plane2.n = Vector{{0}, {2 * test}, {-1}}.normalize();
     Intersect(m, plane2, precise);
     if(Check( m))
         std::cout<<"OK   "<<  Check(m)<<std::endl;
@@ -70,14 +70,14 @@ void Dodecahedron( Mesh &m, double precise){
     Scalation(m, 2, 2, 2);
     double phi = 1.6180339887;
 
-    Vertex v0 ={ 1 , 1 , 1};
-    Vertex v1 ={ -1 , 1 , 1};
-    Vertex v2 ={ 1 , -1 , 1};
-    Vertex v3 ={  1 , 1 , -1};
-    Vertex v4 ={  -1 , -1 , 1};
-    Vertex v5 ={  -1 , 1 , -1};
-    Vertex v6 ={  1 , -1 , -1};
-    Vertex v7 ={  -1 , -1 , -1};
+    Vertex v0 ={ 1, 1 , 1};
+    Vertex v1 ={ -1, 1 , 1};
+    Vertex v2 ={ 1, -1 , 1};
+    Vertex v3 ={ 1, 1 , -1};
+    Vertex v4 ={ -1, -1 , 1};
+    Vertex v5 ={ -1, 1 , -1};
+    Vertex v6 ={ 1, -1 , -1};
+    Vertex v7 ={ -1, -1 , -1};
 
     Vertex v8 ={ phi, 1/phi, 0};
     Vertex v9 ={ -phi, 1/phi, 0};
@@ -88,7 +88,6 @@ void Dodecahedron( Mesh &m, double precise){
     Vertex v13 ={ 0,-phi, 1/phi};
     Vertex v14 ={ 0,phi, -1/phi};
     Vertex v15 ={ 0,-phi, -1/phi};
-
 
     Intersect(m, FlatByPoints(v4, v2, v13), precise);
     Intersect(m, FlatByPoints(v2, v0, v10), precise);
@@ -122,7 +121,7 @@ void Icosahedron( Mesh &m, double precise){
     Vertex v10 ={ b, -a, 0};
     Vertex v11 ={ -b, -a, 0};
 
-    Intersect(m, FlatByPoints(v0, v4, v1), precise);//4
+    Intersect(m, FlatByPoints(v0, v4, v1), precise);
     Intersect(m, FlatByPoints(v0, v9, v4), precise);
     Intersect(m, FlatByPoints(v9, v5, v4), precise);
     Intersect(m, FlatByPoints(v4, v5, v8), precise);
