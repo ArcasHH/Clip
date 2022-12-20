@@ -15,7 +15,3 @@ void Scalation(Mesh &m, double x, double y, double z){
         m.Vertices[i].z *= z;
     }
 }
-
-void Rotation(Mesh &m, double phi, double psi, double teta){
-    
-}

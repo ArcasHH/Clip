@@ -98,13 +98,9 @@ int main()
 
 
     // Vector r = {0.5,0.5,0.5};
-    // //Scalation(m2, 1.5,1.5, 1.5);
+    // double s = 1.5;
+    // Scalation(m, s,s, s);
     // Translation(m2,r);
-    
-
-    double precise = 1e-6;
- 
-
 
 
 
@@ -113,37 +109,41 @@ int main()
     Flat plane2;
 
 
-
-
-
     // Dodecahedron( m, precise);
 
     // Icosahedron( m, precise);
 
-    Cuboctahedron( m, precise );
+    // Cuboctahedron( m, precise );
 
-    plane2.p = {{0}, {0}, {1 - precise*0.9}};//not change
-    plane2.n = Vector{{0}, {0}, {1}}.normalize();
-    Intersect(m, plane2, precise);
+    // plane2.p = {{0}, {0}, {1 - precise*9}};//not change
+    // plane2.n = Vector{{0}, {0}, {1}}.normalize();
+    // Intersect(m, plane2, precise);
 
-    plane2.p = {{0}, {1}, {1 - precise}};//not change
-    plane2.n = Vector{{1}, {1}, {1}}.normalize();
-    Intersect(m, plane2, precise);
+    // plane2.p = {{0}, {1}, {1 - precise*17}};//not change
+    // plane2.n = Vector{{1}, {1}, {1}}.normalize();
+    // Intersect(m, plane2, precise);
 
-        plane2.p = {{0}, {0}, {1 - precise}};//not change
-    plane2.n = Vector{{0}, {0}, {1}}.normalize();
-    Intersect(m, plane2, precise);
+    // plane2.p = {{0}, {1 - precise * 9}, {1}};//not change
+    // plane2.n = Vector{{0}, {1}, {0}}.normalize();
+    // Intersect(m, plane2, precise);
 
-    plane2.p = {{0}, {1}, {1 - precise}};//not change
-    plane2.n = Vector{{1}, {1}, {1}}.normalize();
-    Intersect(m, plane2, precise);
+    // double scalar = 400000;//при 1000 уже изменяется кол-во вершин и граней. при 50 уже некорректно. при 10 уже Empty intersect
+    // plane2.p = {{0}, {0}, {1 - precise*scalar}};// change
+    // plane2.n = Vector{{0}, {0}, {-1}}.normalize();
+    // Intersect(m, plane2, precise);
 
+    // plane2.p = {{0}, {1}, {1 - precise*scalar}};// change
+    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
+    // Intersect(m, plane2, precise);
+
+    // plane2.p = {{0}, {1 - precise * scalar}, {1}};// change
+    // plane2.n = Vector{{0}, {-1}, {0}}.normalize();
+    // Intersect(m, plane2, precise);
 
 
 
 
     // Rhombicuboctahedron( m, precise );
-
 
     // Rhombicuboctahedron2( m, precise );
 
@@ -155,50 +155,30 @@ int main()
 
     // Tetrahedron(m, precise);
 
-   
-
-    // Flat plane2;
 
 
 
-
-    // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{0}, {0}, {1}}.normalize();
-    // Intersect(m, plane2, precise);
-
-
+    plane2.p = {{0}, {0}, {0}};
+    plane2.n = Vector{{1}, {1}, {1}}.normalize();
+    Intersect(m, plane2, precise);
 
 
     // plane2.p = {{0}, {0}, {0}}; 
     // plane2.n = Vector{{1}, {0}, {0}}.normalize();
     // Intersect(m, plane2, precise);
-    //     plane2.p = {{0}, {0}, {0}}; 
-    // plane2.n = Vector{{-1}, {-1}, {1}}.normalize();
-    // Intersect(m, plane2, precise);
 
-
-    // plane2.p = {{0}, {1}, {0.9998}}; // not empty
-    // plane2.n = Vector{{-1}, {-1}, {-1}}.normalize();
-    // Intersect(m, plane2, precise);
-
-    // plane2.p = {{0}, {1}, {0.999}}; // not empty
-    // plane2.n = Vector{{-1}, {-1.003}, {-1}}.normalize();
+    // plane2.p = {{0}, {0.7}, {0}}; 
+    // plane2.n = Vector{{0}, {1}, {0}}.normalize();
     // Intersect(m, plane2, precise);
 
 
 
-    //Check(m);
+
+    Write(m, precise);//запись в new.obj полученной модели
 
 
     std::vector<mdl::Vertex> ver; //convert Mesh back to mdl::Mesh
     std::vector<Vertex> m_ver;
-    // for(int i =0; i < m.Vertices.size(); ++i){
-    //     mdl::Vertex v;
-    //     v.Position = {{m.Vertices[i].x}, {m.Vertices[i].y}, {m.Vertices[i].z}};
-    //     ver.push_back(v);
-    // }
-
-    Write(m, precise);//запись в new.obj полученной модели
 
     for(int i = 0; i < m.Faces.size(); ++i){//пересчитать нормали
         Vector n = Normal( m.Faces[i], m, precise);
@@ -213,16 +193,15 @@ int main()
         }
     }
     std::vector<unsigned int> indices;
-    for(int i =0; i < m.Faces.size(); ++i){
-        for( int j = 0; j < m.Faces[i].Indices.size(); ++j){
+    for(int i =0; i < m.Faces.size(); ++i)
+        for( int j = 0; j < m.Faces[i].Indices.size(); ++j)
             indices.push_back(m.Faces[i].Indices[j]);
-        }
-    }
+
     bool IsTr = Check(m);
     std::cout<<"v: "<<m.Vertices.size() <<"   f: "<<m.Faces.size()<<std::endl;
     std::cout<<"is correct  "<< IsTr <<std::endl;
     
-    mdl::Mesh new_res = {{ver}, {indices},true};
+    mdl::Mesh new_res = {ver, indices, IsTr};
     ourModel.meshes[0] = new_res;
 
 

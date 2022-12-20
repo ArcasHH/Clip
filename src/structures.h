@@ -8,10 +8,12 @@
 
 #include "obj_parser.h"
 
+#include "defaults.h"
+
 
 
 struct Vector {
-    double x{0.f}, y{0.f}, z{0.f};
+    double x{0.}, y{0.}, z{0.};
     int c;
 
     Vector() = default;
@@ -74,7 +76,6 @@ inline Vector operator+(Vector const &B, Vector const &A) {
     return v;
 }
 
-// C = A - B; -> A = .operator-(A, B)
 inline Vector operator-(Vector const &B, Vector const &A) {
     Vector v{B};
     v -= A;
@@ -82,8 +83,8 @@ inline Vector operator-(Vector const &B, Vector const &A) {
 }
 
 inline bool operator==(Vector const &B, Vector const &A) {
-    double precise = 1e-5;
-    return (std::abs(A.x - B.x) < precise && std::abs(A.y - B.y) < precise && std::abs(A.z - B.z) < precise);
+    double p = precise;
+    return ((A - B).length() < p);
 }
 
 struct Segment {
@@ -123,7 +124,7 @@ struct Flat {
 };
 
 inline bool operator==(Flat const &f1, Flat const &f2){
-    if(f1.n == f2.n && f1.D() == f2.D())
+    if(f1.n == f2.n && std::abs(f1.D() - f2.D()) < precise)
         return true;
     else    
         return false;

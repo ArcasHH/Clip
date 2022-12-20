@@ -10,9 +10,9 @@ void Test(Mesh const &m_in, double precise){
 
     Flat plane2;
 
-    double test = precise;
+    double test = precise*10;
 
-    plane2.p = {{1}, {1}, {1 - test * 0.9}}; // empty
+    plane2.p = {{1}, {1}, {1 - test* 0.9}}; // empty
     plane2.n = Vector{{0}, {0}, {-1}}.normalize();
     Intersect(m, plane2, precise);
     if(!Check( m ))
@@ -21,7 +21,7 @@ void Test(Mesh const &m_in, double precise){
         std::cout<<" ne OK"<<std::endl;
     m = m_in;
 
-    plane2.p = {{1}, {1}, {1 - 2 * test}}; // not empty
+    plane2.p = {{1}, {1}, {1 - test* 1.1 }}; // not empty
     Intersect(m, plane2, precise);
     if(Check( m ))
         std::cout<<"OK   "<<  Check(m)<<std::endl;
@@ -39,7 +39,7 @@ void Test(Mesh const &m_in, double precise){
         std::cout<<" ne OK"<<std::endl;
     m = m_in;
 
-    plane2.p = {{1}, {1}, {1 - 4  * test}};//not empty
+    plane2.p = {{1}, {1}, {1 - 2 * test}};//not empty
     Intersect(m, plane2, precise);
     if(Check( m ))
         std::cout<<"OK   "<<  Check(m)<<std::endl;
@@ -48,7 +48,7 @@ void Test(Mesh const &m_in, double precise){
     m = m_in;
 
     plane2.p = {{0}, {0}, {1}}; // empty
-    plane2.n = Vector{{0}, {test}, {-1}}.normalize();
+    plane2.n = Vector{{0}, {0.9 * test}, {-1}}.normalize();
     Intersect(m, plane2, precise);
     if(!Check( m))
         std::cout<<"OK   "<<  Check(m)<<std::endl;
@@ -56,7 +56,7 @@ void Test(Mesh const &m_in, double precise){
         std::cout<<" ne OK"<<std::endl;
     m = m_in;
                                  // not empty
-    plane2.n = Vector{{0}, {2 * test}, {-1}}.normalize();
+    plane2.n = Vector{{0}, {1.9 * test}, {-1}}.normalize();
     Intersect(m, plane2, precise);
     if(Check( m))
         std::cout<<"OK   "<<  Check(m)<<std::endl;
@@ -67,7 +67,7 @@ void Test(Mesh const &m_in, double precise){
 
 
 void Dodecahedron( Mesh &m, double precise){
-    Scalation(m, 2, 2, 2);
+    Scalation(m, 2.5, 2.5, 2.5);
     double phi = 1.6180339887;
 
     Vertex v0 ={ 1, 1 , 1};
@@ -106,6 +106,7 @@ void Dodecahedron( Mesh &m, double precise){
 }
 
 void Icosahedron( Mesh &m, double precise){
+    Scalation(m, 2, 2, 2);
     double a = 0.525731112;
     double b = 0.850650808;
     Vertex v0 ={ -a , 0 , b};
@@ -199,8 +200,6 @@ void Cuboctahedron(Mesh &m, double precise){
     plane.p = {{0.5}, {0.5}, {-1}};
     plane.n = Vector{{1}, {1}, {-1}}.normalize();
     Intersect(m, plane, precise);
-
-
 
     plane.p = {{-0.5}, {-0.5}, {-1}};
     plane.n = Vector{{-1}, {-1}, {-1}}.normalize();
@@ -305,9 +304,6 @@ void Rhombicuboctahedron3(Mesh &m, double precise){
     plane.p = {{1}, {1}, {-0.5}};
     plane.n = Vector{{0}, {1}, {-1}}.normalize();
     Intersect(m, plane, precise);
-
-
-
 
     plane.p = {{0.5}, {1}, {1}};
     plane.n = Vector{{1}, {1}, {0}}.normalize();
