@@ -97,6 +97,7 @@ struct Segment {
 
 struct Face {
     std::vector<int> Indices;////////////////////////////пересмотреть
+    Vector norm;
     
     int operator[] (int pos) const { return Indices.at(pos); }
     int &operator[] (int pos) { return Indices.at(pos); }

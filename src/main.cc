@@ -104,14 +104,14 @@ int main()
 
 
 
-    Test(m, precise);
+    // Test(m, precise);
 
     Flat plane2;
 
 
     // Dodecahedron( m, precise);
 
-    // Icosahedron( m, precise);
+    Icosahedron( m, precise);
 
     // Cuboctahedron( m, precise );
 
@@ -158,16 +158,16 @@ int main()
 
 
 
-    plane2.p = {{0}, {0}, {0}};
-    plane2.n = Vector{{1}, {1}, {1}}.normalize();
-    Intersect(m, plane2, precise);
+    // plane2.p = {{0}, {0}, {0}};
+    // plane2.n = Vector{{1}, {1}, {1}}.normalize();
+    // Intersect(m, plane2, precise);
 
 
     // plane2.p = {{0}, {0}, {0}}; 
-    // plane2.n = Vector{{1}, {0}, {0}}.normalize();
+    // plane2.n = Vector{{1}, {1}, {1}}.normalize();
     // Intersect(m, plane2, precise);
 
-    // plane2.p = {{0}, {0.7}, {0}}; 
+    // plane2.p = {{0}, {0}, {0}}; 
     // plane2.n = Vector{{0}, {1}, {0}}.normalize();
     // Intersect(m, plane2, precise);
 

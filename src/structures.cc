@@ -50,7 +50,8 @@ Vector Normal( Face const &f, Mesh const &m, double precise){ //получени
         return n.normalize();
     }
     else
-        std::cerr<<"invalid input"<<std::endl;
+        return Vector{0, 0, 0};
+        // std::cerr<<"invalid input"<<std::endl;
 }
 
 double PointInFlat (Vertex const &p, Flat const &f){//подставление координат точки в ур.плоскости
@@ -326,6 +327,76 @@ void Triangulation(Mesh &m) { //переделай на триангуляцию
     DeleteUncorrectFaces(m);
 }
 
+void Correct(Mesh &m, double precise){
+
+    std::vector<Flat> flats;
+    for(int i =0; i < m.Faces.size(); ++i){
+        if(Vector{{m.Vertices[m.Faces[i].Indices[0]]},{m.Vertices[m.Faces[i].Indices[1]]}}.cross(Vector{{m.Vertices[m.Faces[i].Indices[1]]},{m.Vertices[m.Faces[i].Indices[2]]}}).length_sq() <= precise){
+            for(int n =0; n < 3; ++n){
+                m.Faces[i].Indices.erase(m.Faces[i].Indices.begin());
+            }
+        }
+        Flat f;
+        f.n = Normal(m.Faces[i], m, precise);
+        f.p = m.Vertices[m.Faces[i].Indices[0]];
+        m.Faces[i].norm = f.n;
+        bool uniq = true;
+        for(int j =0; j < flats.size(); ++j){
+            if( f == flats[j])
+                uniq = false;
+        }
+        if(uniq && !(f.n == Vector{0, 0, 0})){
+            flats.push_back(f);
+        }
+    }
+    DeleteUncorrectFaces(m);
+
+    std::vector< std::vector<Vertex>> vertices;
+    for(int i =0; i < flats.size(); ++i){
+        std::vector<Vertex> vert;
+        for(int j = 0; j < m.Vertices.size(); ++j){
+            if(std::abs(PointInFlat(m.Vertices[j], flats[i])) < precise){
+                vert.push_back(m.Vertices[j]);
+            }
+        }
+        vert = tries(vert, flats[i], precise);
+
+        int size = vert.size();
+        std::vector<Vertex> del;
+        std::vector<Vertex> vert_copy;
+        for(int j = 0; j < size; ++j){
+            Vector n = Vector{{vert[j % vert.size()]},{vert[(j + 1)% vert.size()]}}.cross(Vector{{vert[(j + 1)% vert.size()]},{vert[(j + 2)% vert.size()]}});
+            if(n.length() < precise){
+                del.push_back(vert[(j + 1)% vert.size()]);
+                m.Vertices.erase(m.Vertices.begin() + getVertexIndex(vert[(j + 1)% vert.size()], m));
+                //std::cout<<"del     "<< i <<"    "<<vert[(j + 1)% vert.size()]<<std::endl;
+            }
+        }
+        for(int j = 0; j < vert.size(); ++j){
+            bool not_deleted = true;
+            for(int k = 0; k < del.size(); ++k)
+                if(vert[j] == del[k])
+                    not_deleted = false;
+            if(not_deleted)
+                vert_copy.push_back(vert[j]);
+        }
+        vert = vert_copy;
+        vertices.push_back(vert);
+    }
+
+
+    m.Faces.clear();
+    for(int i =0; i < vertices.size(); ++i){
+        Face new_face;
+        for(int j =0; j < vertices[i].size(); ++j){
+            new_face.Indices.push_back(getVertexIndex(vertices[i][j], m));
+        }
+        new_face.norm = flats[i].n;
+        m.Faces.push_back(new_face);
+    }
+
+}
+
 bool Check(Mesh const &m){//проверка н аправильность построения формулой Эйлера
         return (m.Vertices.size() - m.Faces.size()/2 == 2);
 }
@@ -334,7 +405,8 @@ void Intersect(Mesh &m, Flat const &f, double precise){ //отсечение о�
     PointClassify(m, f, precise);
     if(SpecialCases(m)){
         Mesh res = ResultOfIntersect(m, f, precise);
-        //Correct(res, precise);
+        Triangulation(res);
+        Correct(res, precise);
         Triangulation(res);
         m = res;
     }
