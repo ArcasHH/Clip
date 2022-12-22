@@ -93,7 +93,7 @@ int main()
     // ...........................................................................................................s....................................................
 
     Mesh m = Convert(ourModel.meshes[0]);
-
+    //mdl::Model ourModel2("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
     //Mesh m2 = Convert(ourModel2.meshes[0]);
 
 
@@ -159,7 +159,7 @@ int main()
 
 
     // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{1}, {1}, {1}}.normalize();
+    // plane2.n = Vector{{1}, {3}, {7}}.normalize();
     // Intersect(m, plane2, precise);
 
 
@@ -176,6 +176,63 @@ int main()
 
     Write(m, precise);//запись в new.obj полученной модели
 
+    // mdl::Model ourModel2("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
+    // Mesh m2 = Convert(ourModel2.meshes[0]);
+
+
+    // Vector r = {-1,1,1};
+    // // double s = 1.5;
+    // // Scalation(m, s,s, s);
+    // Translation(m2,r);
+    
+    // ClassifyObjects(m, m2, precise);
+    // ClassifyObjects(m2, m, precise);
+    // Correct(m, precise);
+    // Correct(m2, precise);
+    // Adj( m );
+    // Adj( m2 );
+
+    // bool_intersectiom( m, m2, precise);//пересечение
+
+
+
+
+    // for(int i =0; i < m.Vertices.size(); ++i){
+    //     std::cout<<"vert 1   "<< i <<"   "<<m.Vertices[i]<<"     c:    "<<m.Vertices[i].c<<::endl;
+    //     std::cout<<"f1     ";
+    //     for(int j =0; j < m.Vertices[i].faces.size(); ++j){
+    //         std::cout<< m.Vertices[i].faces[j]<<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+    // for(int i =0; i < m.Faces.size(); ++i){
+    //     std::cout<<" face 1  "<<i<<"    ";
+    //     for(int j =0; j < m.Faces[i].Indices.size(); ++j){
+    //         std::cout<<m.Faces[i].Indices[j]<<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+    // std::cout<<std::endl;
+    // for(int i =0; i < m2.Vertices.size(); ++i){
+    //     std::cout<<"vert 2   "<< i <<"   "<<m2.Vertices[i]<<"     c:    "<<m2.Vertices[i].c<<::endl;
+    //     std::cout<<"f2    ";
+    //     for(int j =0; j < m2.Vertices[i].faces.size(); ++j){
+    //         std::cout<< m2.Vertices[i].faces[j]<<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+    // for(int i =0; i < m2.Faces.size(); ++i){
+    //     std::cout<<" face 2  "<<i<<"    ";
+    //     for(int j =0; j < m2.Faces[i].Indices.size(); ++j){
+    //         std::cout<<m2.Faces[i].Indices[j]<<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+    // std::cout<<std::endl;
+
+
+    // Triangulation(m);
+    // Triangulation(m2);
 
     std::vector<mdl::Vertex> ver; //convert Mesh back to mdl::Mesh
     std::vector<Vertex> m_ver;

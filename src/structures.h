@@ -15,6 +15,7 @@
 struct Vector {
     double x{0.}, y{0.}, z{0.};
     int c;
+    std::vector<int> faces;
 
     Vector() = default;
     Vector(double x, double y, double z) : x{x}, y{y}, z{z} {}
@@ -203,7 +204,7 @@ void Intersect(Mesh &m, Flat const &f, double precise);
 
 double cos(Vector const &v1, Vector const &v2);
 
-
+void Adj(Mesh & m);
 
 void ClassifyObjects(Mesh &m1, Mesh &m2, double precise);
 
@@ -211,7 +212,7 @@ Mesh ResultOfDifference(Mesh &m1, Mesh &m2, double precise);
 
 void bool_difference(Mesh &m1, Mesh &m2, double precise);
 
-void bool_difference(Mesh &m1, Mesh &m2, double precise);
+void bool_intersectiom(Mesh &m1, Mesh &m2, double precise);
 
 namespace mdl { class Mesh; }
 Mesh Convert(mdl::Mesh const &mesh);

@@ -388,13 +388,11 @@ void Correct(Mesh &m, double precise){
     m.Faces.clear();
     for(int i =0; i < vertices.size(); ++i){
         Face new_face;
-        for(int j =0; j < vertices[i].size(); ++j){
+        for(int j =0; j < vertices[i].size(); ++j)
             new_face.Indices.push_back(getVertexIndex(vertices[i][j], m));
-        }
         new_face.norm = flats[i].n;
         m.Faces.push_back(new_face);
     }
-
 }
 
 bool Check(Mesh const &m){//проверка н аправильность построения формулой Эйлера
@@ -409,5 +407,49 @@ void Intersect(Mesh &m, Flat const &f, double precise){ //отсечение о�
         Correct(res, precise);
         Triangulation(res);
         m = res;
+    }
+}
+
+
+void Adj(Mesh & m){
+    for(int i =0; i < m.Faces.size(); ++i)
+        for(int j =0; j < m.Faces[i].Indices.size(); ++j)
+            m.Vertices[m.Faces[i].Indices[j]].faces.push_back(i);
+}
+
+
+void ClassifyObjects(Mesh &m1, Mesh &m2, double precise){//Классификация точек m1 относительно m2(для триангулированных)
+    
+    for(int i =0; i<m1.Vertices.size(); ++i){
+        int in_points = 0;
+        int on_points = 0;
+        int out_points = 0;
+        for(int j =0; j < m2.Faces.size(); ++j){
+            Flat f = FlatByPoints(m2.Vertices[m2.Faces[j].Indices[0]], m2.Vertices[m2.Faces[j].Indices[2]], m2.Vertices[m2.Faces[j].Indices[1]]);
+            if( PointInFlat(m1.Vertices[i], f) < -precise)//IN
+                in_points += 1;
+            else if(PointInFlat(m1.Vertices[i], f) < precise && PointInFlat(m1.Vertices[i], f)  > -precise)//ON
+                on_points += 1;
+            else if( PointInFlat(m1.Vertices[i], f) > precise)//OUT
+                out_points += 1;
+        }
+        if(in_points == m2.Faces.size() && out_points == 0)
+            m1.Vertices[i].c = 1;
+        else if(on_points + in_points == m2.Faces.size() && out_points == 0)
+            m1.Vertices[i].c = 0;
+        else if(out_points != 0)
+            m1.Vertices[i].c = -1;
+    }
+}
+
+void bool_intersectiom(Mesh &m1, Mesh &m2, double precise){//пересечение m1 и m2
+    for(int i =0; i < m2.Vertices.size(); ++i){
+        if(m2.Vertices[i].c == 1){
+            for(int j =0; j < m2.Vertices[i].faces.size(); ++j){
+                Face f = m2.Faces[m1.Vertices[i].faces[j]];
+                Flat flat = FlatByPoints(m2.Vertices[f.Indices[0]], m2.Vertices[f.Indices[2]], m2.Vertices[f.Indices[1]]);
+                Intersect(m1, flat, precise);
+            }
+        }
     }
 }
