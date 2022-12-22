@@ -443,13 +443,75 @@ void ClassifyObjects(Mesh &m1, Mesh &m2, double precise){//Классифика�
 }
 
 void bool_intersectiom(Mesh &m1, Mesh &m2, double precise){//пересечение m1 и m2
+    ClassifyObjects(m1, m2, precise);
+    ClassifyObjects(m2, m1, precise);
+    Correct(m1, precise);
+    Correct(m2, precise);
+    
+    Adj( m1 );
+    Adj( m2 );
+
+    int in1 =0;
+    int in2 = 0;
+    int on1 =0;
+    int on2 = 0;
+    for(int i =0; i < m1.Vertices.size(); ++i){
+        if(m1.Vertices[i].c == 1)
+           in1 ++;
+        if(m1.Vertices[i].c == 0)
+           on1 ++;
+    }
+        
     for(int i =0; i < m2.Vertices.size(); ++i){
-        if(m2.Vertices[i].c == 1){
+        if(m2.Vertices[i].c == 1)
+            in2 ++;
+        if(m2.Vertices[i].c == 0)
+           on2 ++;
+    }  
+    std::cout<<"  in1:  "<<in1<<"   in2:  "<<in2<<"  on1:  "<<on1<<"   on2:  "<<on2<<std::endl;
+
+    // for(int i =0; i < m1.Vertices.size(); ++i){
+    //     std::cout<<"vert 1   "<< i <<"   "<<m1.Vertices[i]<<"     c:    "<<m1.Vertices[i].c<<::endl;
+    //     std::cout<<"f1     ";
+    //     for(int j =0; j < m1.Vertices[i].faces.size(); ++j){
+    //         std::cout<< m1.Vertices[i].faces[j]<<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+    // for(int i =0; i < m1.Faces.size(); ++i){
+    //     std::cout<<" face 1  "<<i<<"    ";
+    //     for(int j =0; j < m1.Faces[i].Indices.size(); ++j){
+    //         std::cout<<m1.Faces[i].Indices[j]<<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+    // std::cout<<std::endl;
+    // for(int i =0; i < m2.Vertices.size(); ++i){
+    //     std::cout<<"vert 2   "<< i <<"   "<<m2.Vertices[i]<<"     c:    "<<m2.Vertices[i].c<<::endl;
+    //     std::cout<<"f2    ";
+    //     for(int j =0; j < m2.Vertices[i].faces.size(); ++j){
+    //         std::cout<< m2.Vertices[i].faces[j]<<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+    // for(int i =0; i < m2.Faces.size(); ++i){
+    //     std::cout<<" face 2  "<<i<<"    ";
+    //     for(int j =0; j < m2.Faces[i].Indices.size(); ++j){
+    //         std::cout<<m2.Faces[i].Indices[j]<<' ';
+    //     }
+    //     std::cout<<std::endl;
+    // }
+    // std::cout<<std::endl;
+
+    // std::cout<<"ASD2"<<std::endl;
+    for(int i =0; i < m2.Vertices.size(); ++i)
+        if(m2.Vertices[i].c != -1){
             for(int j =0; j < m2.Vertices[i].faces.size(); ++j){
                 Face f = m2.Faces[m1.Vertices[i].faces[j]];
                 Flat flat = FlatByPoints(m2.Vertices[f.Indices[0]], m2.Vertices[f.Indices[2]], m2.Vertices[f.Indices[1]]);
                 Intersect(m1, flat, precise);
             }
-        }
     }
+    Triangulation(m1);
+    Triangulation(m2);
 }

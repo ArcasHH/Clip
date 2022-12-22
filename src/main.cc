@@ -111,7 +111,7 @@ int main()
 
     // Dodecahedron( m, precise);
 
-    Icosahedron( m, precise);
+    // Icosahedron( m, precise);
 
     // Cuboctahedron( m, precise );
 
@@ -178,20 +178,15 @@ int main()
 
     // mdl::Model ourModel2("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
     // Mesh m2 = Convert(ourModel2.meshes[0]);
-
-
-    // Vector r = {-1,1,1};
-    // // double s = 1.5;
-    // // Scalation(m, s,s, s);
-    // Translation(m2,r);
+    // Icosahedron( m, precise);
+    // Dodecahedron( m2, precise);
+    // double s = 0.5;
+    // Scalation(m2, s,s, s);
+    // double a = 0.525731112;
+    // double b = 0.850650808;
+    // Vector r = { -a , 0 , b};
     
-    // ClassifyObjects(m, m2, precise);
-    // ClassifyObjects(m2, m, precise);
-    // Correct(m, precise);
-    // Correct(m2, precise);
-    // Adj( m );
-    // Adj( m2 );
-
+    // Translation(m2,r);
     // bool_intersectiom( m, m2, precise);//пересечение
 
 
@@ -231,8 +226,7 @@ int main()
     // std::cout<<std::endl;
 
 
-    // Triangulation(m);
-    // Triangulation(m2);
+    
 
     std::vector<mdl::Vertex> ver; //convert Mesh back to mdl::Mesh
     std::vector<Vertex> m_ver;
