@@ -125,6 +125,7 @@ struct Flat {
     double D() const { return -n.x * p.x - n.y * p.y - n.z * p.z; }
 };
 
+
 inline bool operator==(Flat const &f1, Flat const &f2){
     if(f1.n == f2.n && std::abs(f1.D() - f2.D()) < precise)
         return true;

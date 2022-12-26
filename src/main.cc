@@ -111,7 +111,7 @@ int main()
 
     // Dodecahedron( m, precise);
 
-    // Icosahedron( m, precise);
+    Icosahedron( m, precise);
 
     // Cuboctahedron( m, precise );
 
@@ -174,17 +174,17 @@ int main()
 
 
 
-    Write(m, precise);//запись в new.obj полученной модели
+    // Write(m, precise);//запись в new.obj полученной модели
 
     // mdl::Model ourModel2("C:\\Users\\Arcasha\\Desktop\\tmp\\cut\\Clip\\models\\new.obj");
     // Mesh m2 = Convert(ourModel2.meshes[0]);
-    // Icosahedron( m, precise);
-    // Dodecahedron( m2, precise);
-    // double s = 0.5;
+    // //Icosahedron( m, precise);
+    // //Dodecahedron( m, precise);
+    // double s = 1;
     // Scalation(m2, s,s, s);
-    // double a = 0.525731112;
-    // double b = 0.850650808;
-    // Vector r = { -a , 0 , b};
+    // // double a = 0.525731112;
+    // // double b = 0.850650808;
+    // Vector r = { 1 , 0 , 0};
     
     // Translation(m2,r);
     // bool_intersectiom( m, m2, precise);//пересечение
