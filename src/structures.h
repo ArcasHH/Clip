@@ -187,7 +187,7 @@ void DeleteFace(Mesh &m, Face &f);
 
 void DeleteUncorrectFaces(Mesh &m);
 
-std::vector<Vertex> tries (std::vector<Vertex> const &intersect, Flat const &f, double precise);
+std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double precise);
 
 Vertex Segment_Flat_Intersection(Segment const &s, Flat const &f);
 
