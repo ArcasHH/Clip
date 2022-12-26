@@ -180,7 +180,7 @@ void DeleteUncorrectFaces(Mesh &m){//удаление граней, где ме�
         m.Faces.erase(m.Faces.begin() + index[i] - i);
 }
             
-std::vector<Vertex> tries (std::vector<Vertex> &intersect, Flat const &f, double precise){//упорядочивание вектора вершин в порядке обхода сечения(соотв.f)
+std::vector<Vertex> tries (std::vector<Vertex> const &intersect, Flat const &f, double precise){//упорядочивание вектора вершин в порядке обхода сечения(соотв.f)
 
     precise = precise * precise;
     std::vector<Vertex> tries;
@@ -329,7 +329,6 @@ void Triangulation(Mesh &m) { //переделай на триангуляцию
 void Correct(Mesh &m, double precise){
     Triangulation(m);
     std::vector<Flat> UniqueFlats;
-    auto &flats = UniqueFlats;
 
     for (Face &CurrFace : m.Faces) {
         Vertex &A = m.Vertices[CurrFace.Indices[0]];
@@ -353,35 +352,28 @@ void Correct(Mesh &m, double precise){
     DeleteUncorrectFaces(m);
 
     std::vector< std::vector<Vertex>> vertices;
-    for(int i =0; i < flats.size(); ++i){
+    for(Flat &CurrFlat : UniqueFlats){
         std::vector<Vertex> vert;
-        for(int j = 0; j < m.Vertices.size(); ++j){
-            if(std::abs(PointInFlat(m.Vertices[j], flats[i])) < precise){
-                vert.push_back(m.Vertices[j]);
-            }
-        }
-        vert = tries(vert, flats[i], precise);
+        std::copy_if(m.Vertices.begin(), m.Vertices.end(), std::back_inserter(vert), [&](Vertex &V){
+            return std::abs(PointInFlat(V, CurrFlat)) < precise;
+        });
 
-        int size = vert.size();
-        std::vector<Vertex> del;
-        std::vector<Vertex> vert_copy;
-        for(int j = 0; j < size; ++j){
-            Vector n = Vector{{vert[j % vert.size()]},{vert[(j + 1)% vert.size()]}}.cross(Vector{{vert[(j + 1)% vert.size()]},{vert[(j + 2)% vert.size()]}});
-            if(n.length() < precise){
-                del.push_back(vert[(j + 1)% vert.size()]);
-                m.Vertices.erase(m.Vertices.begin() + getVertexIndex(vert[(j + 1)% vert.size()], m));
-            }
+        vert = tries(vert, CurrFlat, precise);
+        std::vector<Vertex> NotInLine;
+
+        // Этот алгоритм операется на то, что в грани максимум 3 точки могут лежать на одной прямой!
+        for (int j = 0, size = vert.size(); j < size; ++j) {
+            Vertex &A = vert[j];
+            Vertex &B = vert[(j + 1) % size];
+            Vertex &C = vert[(j + 2) % size];
+            
+            Vector Nrm = Vector{A, B}.cross(Vector{B, C});
+            if (Nrm.length_sq() > precise)
+                NotInLine.push_back(B);
+            else
+                m.Vertices.erase(m.Vertices.begin() + getVertexIndex(vert[(j + 1) % size], m));
         }
-        for(int j = 0; j < vert.size(); ++j){
-            bool not_deleted = true;
-            for(int k = 0; k < del.size(); ++k)
-                if(vert[j] == del[k])
-                    not_deleted = false;
-            if(not_deleted)
-                vert_copy.push_back(vert[j]);
-        }
-        vert = vert_copy;
-        vertices.push_back(vert);
+        vertices.push_back(NotInLine);
     }
 
 
@@ -390,7 +382,7 @@ void Correct(Mesh &m, double precise){
         Face new_face;
         for(int j =0; j < vertices[i].size(); ++j)
             new_face.Indices.push_back(getVertexIndex(vertices[i][j], m));
-        new_face.norm = flats[i].n;
+        new_face.norm = UniqueFlats[i].n;
         m.Faces.push_back(new_face);
     }
 }
