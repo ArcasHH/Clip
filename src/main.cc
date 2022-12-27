@@ -109,7 +109,7 @@ int main()
     Flat plane2;
 
 
-    // Dodecahedron( m, precise);
+    Dodecahedron( m, precise);
 
     // Icosahedron( m, precise);
 
@@ -158,9 +158,9 @@ int main()
 
 
 
-    // plane2.p = {{0}, {0}, {0}};
-    // plane2.n = Vector{{1}, {3}, {7}}.normalize();
-    // Intersect(m, plane2, precise);
+    plane2.p = {{0}, {0}, {0}};
+    plane2.n = Vector{{1}, {3}, {7}}.normalize();
+    Intersect(m, plane2, precise);
 
 
     // plane2.p = {{0}, {0}, {0}}; 
